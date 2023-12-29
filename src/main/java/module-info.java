@@ -3,6 +3,6 @@ module com.example.peck {
     requires javafx.fxml;
 
 
-    opens com.example.pacman to javafx.fxml;
-    exports com.example.pacman;
+    opens com.example.peck to javafx.fxml;
+    exports com.example.peck;
 }
