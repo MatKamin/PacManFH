@@ -1,6 +1,8 @@
 package com.example.peck;
 
 import javafx.animation.AnimationTimer;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -11,6 +13,8 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javafx.util.Duration;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,6 +36,7 @@ public class Game extends Application {
 
     private static final char[] WALLS = {'H', 'R', 'L', 'U', 'D', 'F', 'V'};
 
+    private Timeline gameLoop;
 
     private ImageView[][] tileViews = new ImageView[GRID_HEIGHT][GRID_WIDTH];
     private static final String LEVEL_FILE = "/level.txt";
@@ -47,6 +52,8 @@ public class Game extends Application {
 
     private enum Direction {UP, DOWN, LEFT, RIGHT, NONE}
     private Direction direction = Direction.NONE;
+    private Direction desiredDirection = Direction.NONE;
+
 
     /**
      * Starts the JavaFX application, setting up the stage and scene.
@@ -208,21 +215,20 @@ public class Game extends Application {
     }
 
     /**
-     * Starts the main game loop using an AnimationTimer.
+     * Starts the main game loop using Timeline.
      */
     private void startGame() {
-        new AnimationTimer() {
-            long lastUpdate = 0;
+        gameLoop = new Timeline(new KeyFrame(Duration.millis(150), e -> gameUpdate()));
+        gameLoop.setCycleCount(Timeline.INDEFINITE);
+        gameLoop.play();
+    }
 
-            @Override
-            public void handle(long now) {
-                if (now - lastUpdate >= 200_000_000) {
-                    movePacman();
-                    drawPacman();
-                    lastUpdate = now;
-                }
-            }
-        }.start();
+    /**
+     * Contains the Game Logic that needs to be executed each frame
+     */
+    private void gameUpdate() {
+        movePacman();
+        drawPacman();
     }
 
     /**
@@ -232,17 +238,41 @@ public class Game extends Application {
      */
     private void handleInput(KeyCode keyCode) {
         switch (keyCode) {
-            case UP -> direction = Direction.UP;
-            case DOWN -> direction = Direction.DOWN;
-            case LEFT -> direction = Direction.LEFT;
-            case RIGHT -> direction = Direction.RIGHT;
+            case UP -> desiredDirection = Direction.UP;
+            case DOWN -> desiredDirection = Direction.DOWN;
+            case LEFT -> desiredDirection = Direction.LEFT;
+            case RIGHT -> desiredDirection = Direction.RIGHT;
         }
+    }
+
+    /**
+     * Checks if pacman can move in specified direction
+     * @param direction direction which gets checked
+     * @return true if move is possible, false otherwise
+     */
+    private boolean canMoveInDirection(Direction direction) {
+        int nextX = pacmanX;
+        int nextY = pacmanY;
+
+        switch (direction) {
+            case UP -> nextY = Math.floorMod(pacmanY - 1, GRID_HEIGHT);
+            case DOWN -> nextY = Math.floorMod(pacmanY + 1, GRID_HEIGHT);
+            case LEFT -> nextX = Math.floorMod(pacmanX - 1, GRID_WIDTH);
+            case RIGHT -> nextX = Math.floorMod(pacmanX + 1, GRID_WIDTH);
+            case NONE -> { return false; }
+        }
+
+        return canMove(nextX, nextY);
     }
 
     /**
      * Updates Pacman's position based on the current direction.
      */
     private void movePacman() {
+        if (canMoveInDirection(desiredDirection)) {
+            direction = desiredDirection;
+        }
+
         int nextX = pacmanX;
         int nextY = pacmanY;
 
