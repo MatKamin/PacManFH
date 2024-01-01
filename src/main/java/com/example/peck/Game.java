@@ -2,11 +2,14 @@ package com.example.peck;
 
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -19,10 +22,18 @@ public class Game extends Application {
 
     private static final int TILE_SIZE = 25;
     private static final int GRID_WIDTH = 30;
-    private static final int GRID_HEIGHT = 37;
+    private static final int GRID_HEIGHT = 31;
+
+    private static final int SCORE_AREA_HEIGHT = 40;
+    private static final int LIVES_AREA_HEIGHT = 40;
+
+    private static final int WIDTH = GRID_WIDTH * TILE_SIZE;
+    private static final int HEIGHT = (GRID_HEIGHT * TILE_SIZE) + SCORE_AREA_HEIGHT + LIVES_AREA_HEIGHT;
 
     private static final char[] WALLS = {'H', 'R', 'L', 'U', 'D', 'F', 'V'};
 
+
+    private ImageView[][] tileViews = new ImageView[GRID_HEIGHT][GRID_WIDTH];
     private static final String LEVEL_FILE = "/level.txt";
 
     private ImageView pacmanUp_img, pacmanDown_img, pacmanLeft_img, pacmanRight_img, current_img, bigdot_img, smalldot_img, nowall_img, blinky_img, pinky_img, clyde_img, inky_img, railHorizontal_img, railUpRight_img, railUpLeft_img, railRightUp_img, railLeftUp_img, cherries_img, railVertical_img;
@@ -30,6 +41,9 @@ public class Game extends Application {
     private char[] levelData;
     private int pacmanX = 13;
     private int pacmanY = 17;
+
+    private int score = 0;
+    private Label scoreLabel;
 
     private enum Direction {UP, DOWN, LEFT, RIGHT, NONE}
     private Direction direction = Direction.NONE;
@@ -47,7 +61,20 @@ public class Game extends Application {
         setInitialPacmanPosition();
         gameBoard = drawMap();
 
-        Scene scene = new Scene(gameBoard, GRID_WIDTH * TILE_SIZE, GRID_HEIGHT * TILE_SIZE);
+        gameBoard.setLayoutY(SCORE_AREA_HEIGHT); // Shift the game board down
+
+        VBox root = new VBox(); // Create a container for the entire layout
+
+        // Create and configure the score display
+        scoreLabel = new Label("Score: " + score);
+        scoreLabel.setMinHeight(SCORE_AREA_HEIGHT);
+        scoreLabel.setAlignment(Pos.CENTER);
+
+        // Add the scoreLabel and gameBoard to the root container
+        root.getChildren().addAll(scoreLabel, gameBoard);
+
+        Scene scene = new Scene(root, WIDTH, HEIGHT);
+        scene.getStylesheets().add("styles.css"); // Apply external CSS
         scene.setOnKeyPressed(event -> handleInput(event.getCode()));
 
         primaryStage.setTitle("Pac-Man Game");
@@ -153,9 +180,31 @@ public class Game extends Application {
                 GridPane.setColumnIndex(imageView, col);
                 GridPane.setRowIndex(imageView, row);
                 gp.getChildren().add(imageView);
+
+                tileViews[row][col] = imageView; // Store the reference to the ImageView
             }
         }
         return gp;
+    }
+
+    /**
+     * Uodates the score
+     */
+    private void updateScore() {
+        score++;
+        scoreLabel.setText("Score: " + score);
+    }
+
+    /**
+     * When a small dot is eaten, update only the corresponding ImageView
+     * @param x x coordinate
+     * @param y y coordinate
+     */
+    private void eatSmallDot(int x, int y) {
+        updateScore();
+        levelData[(y * GRID_WIDTH) + x] = 'E'; // Replace the SMALLDOT with empty space
+        ImageView tileView = tileViews[y][x];
+        tileView.setImage(nowall_img.getImage()); // Update the image to nowall
     }
 
     /**
@@ -205,6 +254,10 @@ public class Game extends Application {
         }
 
         if (canMove(nextX, nextY)) {
+            char nextPos = levelData[(nextY * GRID_WIDTH) + nextX];
+            if (nextPos == 'B') {
+                eatSmallDot(nextX, nextY);
+            }
             pacmanX = nextX;
             pacmanY = nextY;
         }
