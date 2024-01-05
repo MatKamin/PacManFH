@@ -4,6 +4,7 @@ import javafx.animation.AnimationTimer;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
@@ -19,8 +20,9 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.HashMap;
-import java.util.Map;
+import java.time.LocalTime;
+import java.util.*;
+import java.util.stream.Stream;
 
 public class Game extends Application {
 
@@ -51,9 +53,20 @@ public class Game extends Application {
     private Label scoreLabel;
 
     private enum Direction {UP, DOWN, LEFT, RIGHT, NONE}
+
     private Direction direction = Direction.NONE;
     private Direction desiredDirection = Direction.NONE;
 
+    private int[][] ghostPos;
+
+    private static final Random PRNG = new Random();
+    Direction[] randomDirection = {Direction.UP, Direction.UP, Direction.UP, Direction.UP};
+
+    boolean[] cage = {false, false, false, false};
+
+    private int numberOfGhosts = 1;
+
+    private int counter;
 
     /**
      * Starts the JavaFX application, setting up the stage and scene.
@@ -66,6 +79,7 @@ public class Game extends Application {
         initializeImages();
         levelData = readLevel();
         setInitialPacmanPosition();
+        positionGhost();
         gameBoard = drawMap();
 
         gameBoard.setLayoutY(SCORE_AREA_HEIGHT); // Shift the game board down
@@ -76,6 +90,7 @@ public class Game extends Application {
         scoreLabel = new Label("Score: " + score);
         scoreLabel.setMinHeight(SCORE_AREA_HEIGHT);
         scoreLabel.setAlignment(Pos.CENTER);
+
 
         // Add the scoreLabel and gameBoard to the root container
         root.getChildren().addAll(scoreLabel, gameBoard);
@@ -118,6 +133,7 @@ public class Game extends Application {
 
     /**
      * Scales down the resource image
+     *
      * @param imagePath Path to image file
      * @return ImageView of the Image
      */
@@ -159,10 +175,10 @@ public class Game extends Application {
         Map<Character, ImageView> imageMap = new HashMap<>();
         imageMap.put('S', bigdot_img);
         imageMap.put('B', smalldot_img);
-        imageMap.put('1', blinky_img);
-        imageMap.put('2', pinky_img);
-        imageMap.put('3', clyde_img);
-        imageMap.put('4', inky_img);
+        //imageMap.put('1', blinky_img);
+        //imageMap.put('2', pinky_img);
+        //imageMap.put('3', clyde_img);
+        //imageMap.put('4', inky_img);
         imageMap.put('E', nowall_img);
         imageMap.put('H', railHorizontal_img);
         imageMap.put('R', railUpRight_img);
@@ -204,6 +220,7 @@ public class Game extends Application {
 
     /**
      * When a small dot is eaten, update only the corresponding ImageView
+     *
      * @param x x coordinate
      * @param y y coordinate
      */
@@ -227,8 +244,125 @@ public class Game extends Application {
      * Contains the Game Logic that needs to be executed each frame
      */
     private void gameUpdate() {
+        moveGhost();
         movePacman();
-        drawPacman();
+        draw();
+        counter++;
+    }
+
+    /**
+     * Generates based on, in which directions the ghost can move,  a random value out of the enum Direction, except the value NONE
+     *
+     * @return the generated Direction
+     */
+    private Direction getRandomDirection(int ghostid) {
+        List<Direction> directions = new ArrayList<>();
+        char[] fields = {levelData[((ghostPos[ghostid][1] - 1) * GRID_WIDTH) + ghostPos[ghostid][0]],
+                levelData[((ghostPos[ghostid][1] + 1) * GRID_WIDTH) + ghostPos[ghostid][0]],
+                levelData[(ghostPos[ghostid][1] * GRID_WIDTH) + ghostPos[ghostid][0] - 1],
+                levelData[(ghostPos[ghostid][1] * GRID_WIDTH) + ghostPos[ghostid][0] + 1]
+        };
+        for (int i = 0; i < fields.length; i++) {
+            if (fields[i] != 'D') {
+                directions.add(Direction.values()[i]);
+            }
+        }
+        Direction d = directions.get(PRNG.nextInt(directions.size()));
+        System.out.println(randomDirection[0]);
+        return d;
+    }
+
+    /**
+     * Moves the ghosts randomly
+     */
+    private void moveGhost() {
+        if (counter > 100 * numberOfGhosts && numberOfGhosts < ghostPos.length) {
+            numberOfGhosts++;
+            System.out.println(gameLoop.getRate());
+        }
+        for (int i = 0; i < numberOfGhosts; i++) {
+            int nextX = ghostPos[i][0];
+            int nextY = ghostPos[i][1];
+
+            switch (randomDirection[i]) {
+                case UP -> nextY = Math.floorMod(ghostPos[i][1] - 1, GRID_HEIGHT);
+                case DOWN -> nextY = Math.floorMod(ghostPos[i][1] + 1, GRID_HEIGHT);
+                case LEFT -> nextX = Math.floorMod(ghostPos[i][0] - 1, GRID_WIDTH);
+                case RIGHT -> nextX = Math.floorMod(ghostPos[i][0] + 1, GRID_WIDTH);
+            }
+            if (canMove(nextX, nextY)) {
+
+                ghostPos[i][0] = nextX;
+                ghostPos[i][1] = nextY;
+
+
+            } else {
+
+                if (ghostPos[i][1] == 11 && ghostPos[i][0] == 14 || ghostPos[i][0] == 15) {
+                    randomDirection[i] = getRandomDirection(i);
+                    while (randomDirection[i] == Direction.DOWN) {
+                        randomDirection[i] = getRandomDirection(i);
+                    }
+                }
+                randomDirection[i] = getRandomDirection(i);
+                moveGhost();
+            }
+            //System.out.println(i + ": " + randomDirection[i]);
+        }
+
+    }
+
+    /**
+     * Checks if the Ghosts hit Pacman
+     *
+     * @return if hit true, otherwise false
+     */
+    private boolean death() {
+        //System.out.println("P: "+pacmanX+ " "+ pacmanY+" G1: "+ghostPos[0][0]+" "+ghostPos[0][1] );
+        for (int i = 0; i < ghostPos.length; i++) {
+            if (ghostPos[i][0] == pacmanX && ghostPos[i][1] == pacmanY) {
+                try {
+                    System.out.println("P: " + pacmanX + " " + pacmanY + " G" + i + ": " + ghostPos[i][0] + " " + ghostPos[i][1]);
+                    //stop();
+                    Platform.exit();
+                } catch (Exception e) {
+                    System.out.println(e.getMessage());
+                }
+            }
+        }
+        return false;
+    }
+
+
+    /**
+     * Sets the beginning position of the Ghosts
+     */
+    private void positionGhost() {
+        ghostPos = new int[4][2];
+        for (int row = 0; row < GRID_HEIGHT; row++) {
+            for (int col = 0; col < GRID_WIDTH; col++) {
+                char x = levelData[(row * GRID_WIDTH) + col];
+                switch (x) {
+                    case '1':
+                        ghostPos[0][0] = col;
+                        ghostPos[0][1] = row;
+                        break;
+                    case '2':
+                        ghostPos[1][0] = col;
+                        ghostPos[1][1] = row;
+                        break;
+                    case '3':
+                        ghostPos[2][0] = col;
+                        ghostPos[2][1] = row;
+                        break;
+                    case '4':
+                        ghostPos[3][0] = col;
+                        ghostPos[3][1] = row;
+                        break;
+                }
+
+            }
+        }
     }
 
     /**
@@ -247,6 +381,7 @@ public class Game extends Application {
 
     /**
      * Checks if pacman can move in specified direction
+     *
      * @param direction direction which gets checked
      * @return true if move is possible, false otherwise
      */
@@ -259,7 +394,9 @@ public class Game extends Application {
             case DOWN -> nextY = Math.floorMod(pacmanY + 1, GRID_HEIGHT);
             case LEFT -> nextX = Math.floorMod(pacmanX - 1, GRID_WIDTH);
             case RIGHT -> nextX = Math.floorMod(pacmanX + 1, GRID_WIDTH);
-            case NONE -> { return false; }
+            case NONE -> {
+                return false;
+            }
         }
 
         return canMove(nextX, nextY);
@@ -267,6 +404,7 @@ public class Game extends Application {
 
     /**
      * Updates Pacman's position based on the current direction.
+     * And Checks if Pacman got hit by a ghost
      */
     private void movePacman() {
         if (canMoveInDirection(desiredDirection)) {
@@ -291,6 +429,7 @@ public class Game extends Application {
             pacmanX = nextX;
             pacmanY = nextY;
         }
+        death();
     }
 
     /**
@@ -309,9 +448,9 @@ public class Game extends Application {
     }
 
     /**
-     * Draws Pacman at the current position on the game board.
+     * Draws Pacman and the ghosts at the current position on the game board.
      */
-    private void drawPacman() {
+    private void draw() {
         ImageView newPacman = switch (direction) {
             case UP -> pacmanUp_img;
             case DOWN -> pacmanDown_img;
@@ -325,6 +464,29 @@ public class Game extends Application {
         GridPane.setColumnIndex(newPacman, pacmanX);
         current_img = newPacman;
         gameBoard.getChildren().add(current_img);
+
+        //Blinky - red
+        gameBoard.getChildren().remove(blinky_img);
+        GridPane.setRowIndex(blinky_img, ghostPos[0][1]);
+        GridPane.setColumnIndex(blinky_img, ghostPos[0][0]);
+        gameBoard.getChildren().add(blinky_img);
+
+        //Clyde - yellow
+        gameBoard.getChildren().remove(clyde_img);
+        GridPane.setRowIndex(clyde_img, ghostPos[2][1]);
+        GridPane.setColumnIndex(clyde_img, ghostPos[2][0]);
+        gameBoard.getChildren().add(clyde_img);
+        //blue
+
+        gameBoard.getChildren().remove(inky_img);
+        GridPane.setRowIndex(inky_img, ghostPos[3][1]);
+        GridPane.setColumnIndex(inky_img, ghostPos[3][0]);
+        gameBoard.getChildren().add(inky_img);
+        //pink
+        gameBoard.getChildren().remove(pinky_img);
+        GridPane.setRowIndex(pinky_img, ghostPos[1][1]);
+        GridPane.setColumnIndex(pinky_img, ghostPos[1][0]);
+        gameBoard.getChildren().add(pinky_img);
     }
 
     /**
