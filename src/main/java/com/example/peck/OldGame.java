@@ -1,6 +1,5 @@
 package com.example.peck;
 
-import javafx.animation.AnimationTimer;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Application;
@@ -20,11 +19,9 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.time.LocalTime;
 import java.util.*;
-import java.util.stream.Stream;
 
-public class Game extends Application {
+public class OldGame extends Application {
 
     private static final int TILE_SIZE = 25;
     private static final int GRID_WIDTH = 30;
@@ -43,7 +40,9 @@ public class Game extends Application {
     private ImageView[][] tileViews = new ImageView[GRID_HEIGHT][GRID_WIDTH];
     private static final String LEVEL_FILE = "/level.txt";
 
-    private ImageView pacmanUp_img, pacmanDown_img, pacmanLeft_img, pacmanRight_img, current_img, bigdot_img, smalldot_img, nowall_img, blinky_img, pinky_img, clyde_img, inky_img, railHorizontal_img, railUpRight_img, railUpLeft_img, railRightUp_img, railLeftUp_img, cherries_img, railVertical_img;
+    private ImageView pacmanUp_img, pacmanDown_img, pacmanLeft_img, pacmanRight_img, current_img,
+            bigdot_img, smalldot_img, nowall_img, blinky_img, pinky_img, clyde_img, inky_img,
+            railHorizontal_img, railUpRight_img, railUpLeft_img, railRightUp_img, railLeftUp_img, cherries_img, railVertical_img;
     private GridPane gameBoard;
     private char[] levelData;
     private int pacmanX = 13;
@@ -110,25 +109,25 @@ public class Game extends Application {
      * Initializes all image resources used in the game.
      */
     private void initializeImages() {
-        pacmanDown_img = loadAndScaleImage("pacmanDown.gif");
-        pacmanUp_img = loadAndScaleImage("pacmanUp.gif");
-        pacmanLeft_img = loadAndScaleImage("pacmanLeft.gif");
-        pacmanRight_img = loadAndScaleImage("pacmanRight.gif");
-        current_img = loadAndScaleImage("none.png");
-        bigdot_img = loadAndScaleImage("bigdot.png");
-        smalldot_img = loadAndScaleImage("smalldot.png");
-        nowall_img = loadAndScaleImage("nowall.png");
-        blinky_img = loadAndScaleImage("blinky.gif");
-        pinky_img = loadAndScaleImage("pinky.gif");
-        clyde_img = loadAndScaleImage("clyde.gif");
-        inky_img = loadAndScaleImage("inky.gif");
-        railHorizontal_img = loadAndScaleImage("railHorizontal.png");
-        railUpRight_img = loadAndScaleImage("railUpRight.png");
-        railUpLeft_img = loadAndScaleImage("railUpLeft.png");
-        railRightUp_img = loadAndScaleImage("railRightUp.png");
-        railLeftUp_img = loadAndScaleImage("railLeftUp.png");
-        cherries_img = loadAndScaleImage("cherries.png");
-        railVertical_img = loadAndScaleImage("railVertical.png");
+        pacmanDown_img = loadAndScaleImage("pacman/standard/pacmanDown.gif");
+        pacmanUp_img = loadAndScaleImage("pacman/standard/pacmanUp.gif");
+        pacmanLeft_img = loadAndScaleImage("pacman/standard/pacmanLeft.gif");
+        pacmanRight_img = loadAndScaleImage("pacman/standard/pacmanRight.gif");
+        current_img = loadAndScaleImage("pacman/standard/none.png");
+        bigdot_img = loadAndScaleImage("map/bigDot.png");
+        smalldot_img = loadAndScaleImage("map/smallDot.png");
+        nowall_img = loadAndScaleImage("map/blackTile.png");
+        blinky_img = loadAndScaleImage("ghosts/blinky.gif");
+        pinky_img = loadAndScaleImage("ghosts/pinky.gif");
+        clyde_img = loadAndScaleImage("ghosts/clyde.gif");
+        inky_img = loadAndScaleImage("ghosts/inky.gif");
+        railHorizontal_img = loadAndScaleImage("map/railHorizontal.png");
+        railUpRight_img = loadAndScaleImage("map/railUpRight.png");
+        railUpLeft_img = loadAndScaleImage("map/railUpLeft.png");
+        railRightUp_img = loadAndScaleImage("map/railRightUp.png");
+        railLeftUp_img = loadAndScaleImage("map/railLeftUp.png");
+        cherries_img = loadAndScaleImage("map/cherry.png");
+        railVertical_img = loadAndScaleImage("map/railVertical.png");
     }
 
     /**
