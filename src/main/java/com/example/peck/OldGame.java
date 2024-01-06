@@ -256,7 +256,8 @@ public class OldGame extends Application {
      */
     private Direction getRandomDirection(int ghostid) {
         List<Direction> directions = new ArrayList<>();
-        char[] fields = {levelData[((ghostPos[ghostid][1] - 1) * GRID_WIDTH) + ghostPos[ghostid][0]],
+        char[] fields = {
+                levelData[((ghostPos[ghostid][1] - 1) * GRID_WIDTH) + ghostPos[ghostid][0]],
                 levelData[((ghostPos[ghostid][1] + 1) * GRID_WIDTH) + ghostPos[ghostid][0]],
                 levelData[(ghostPos[ghostid][1] * GRID_WIDTH) + ghostPos[ghostid][0] - 1],
                 levelData[(ghostPos[ghostid][1] * GRID_WIDTH) + ghostPos[ghostid][0] + 1]
@@ -294,19 +295,10 @@ public class OldGame extends Application {
                 ghostPos[i][0] = nextX;
                 ghostPos[i][1] = nextY;
 
-
             } else {
-
-                if (ghostPos[i][1] == 11 && ghostPos[i][0] == 14 || ghostPos[i][0] == 15) {
-                    randomDirection[i] = getRandomDirection(i);
-                    while (randomDirection[i] == Direction.DOWN) {
-                        randomDirection[i] = getRandomDirection(i);
-                    }
-                }
                 randomDirection[i] = getRandomDirection(i);
-                moveGhost();
+                //System.out.println(i + ": " + randomDirection[i]);
             }
-            //System.out.println(i + ": " + randomDirection[i]);
         }
 
     }

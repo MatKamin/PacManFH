@@ -33,7 +33,7 @@ public class Gameboard {
     private Blinky blinky;
     private Pinky pinky;
     private Clyde clyde;
-
+    private List<MovingObjects> ghosts = Arrays.asList(inky, blinky, pinky, clyde);
     //Ghosts
     private int numberOfGhosts = 1;
     private int[][] ghostPos;
@@ -48,7 +48,7 @@ public class Gameboard {
     public Gameboard(String level, String skin) {
         this.counter = 0;
         this.pacman = new Pacman(skin);
-        this.blinky = new Blinky();
+        this.blinky = new Blinky(pacman);
         this.inky = new Inky();
         this.clyde = new Clyde();
         this.pinky = new Pinky();
@@ -239,6 +239,7 @@ public class Gameboard {
                     case '1':
                         ghostPos[0][0] = col;
                         ghostPos[0][1] = row;
+                        this.blinky.setPos(ghostPos[0][0],ghostPos[0][1]);
                         break;
                     case '2':
                         ghostPos[1][0] = col;
@@ -263,20 +264,19 @@ public class Gameboard {
      *
      * @return the generated Direction
      */
-    private Direction getRandomDirection(int ghostid) {
+    private Direction getRandomDirection(int ghostId) {
         List<Direction> directions = new ArrayList<>();
-        char[] fields = {levelData[((ghostPos[ghostid][1] - 1) * GRID_WIDTH) + ghostPos[ghostid][0]],
-                levelData[((ghostPos[ghostid][1] + 1) * GRID_WIDTH) + ghostPos[ghostid][0]],
-                levelData[(ghostPos[ghostid][1] * GRID_WIDTH) + ghostPos[ghostid][0] - 1],
-                levelData[(ghostPos[ghostid][1] * GRID_WIDTH) + ghostPos[ghostid][0] + 1]
+        char[] fields = {levelData[((ghostPos[ghostId][1] - 1) * GRID_WIDTH) + ghostPos[ghostId][0]],
+                levelData[((ghostPos[ghostId][1] + 1) * GRID_WIDTH) + ghostPos[ghostId][0]],
+                levelData[(ghostPos[ghostId][1] * GRID_WIDTH) + ghostPos[ghostId][0] - 1],
+                levelData[(ghostPos[ghostId][1] * GRID_WIDTH) + ghostPos[ghostId][0] + 1]
         };
         for (int i = 0; i < fields.length; i++) {
             if (fields[i] != 'D') {
                 directions.add(Direction.values()[i]);
             }
         }
-        Direction d = directions.get(PNRG.nextInt(directions.size()));
-        return d;
+        return directions.get(PNRG.nextInt(directions.size()));
     }
 
     /**
@@ -297,20 +297,11 @@ public class Gameboard {
                 case RIGHT -> nextX = Math.floorMod(ghostPos[i][0] + 1, GRID_WIDTH);
             }
             if (this.canMove(nextX, nextY)) {
-
                 ghostPos[i][0] = nextX;
                 ghostPos[i][1] = nextY;
-
             } else {
-
-                if (ghostPos[i][1] == 11 && ghostPos[i][0] == 14 || ghostPos[i][0] == 15) {
-                    randomDirection[i] = getRandomDirection(i);
-                    while (randomDirection[i] == Direction.DOWN) {
-                        randomDirection[i] = getRandomDirection(i);
-                    }
-                }
                 randomDirection[i] = getRandomDirection(i);
-                moveGhost();
+                System.out.println(i + ": " + randomDirection[i]);
             }
         }
     }
