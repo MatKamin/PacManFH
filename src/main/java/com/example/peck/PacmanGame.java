@@ -35,26 +35,29 @@ public class PacmanGame {
 
     private Scene initializeScene() {
         //Containers
-        VBox root = new VBox();
+        VBox gameVBox = new VBox();
+        gameVBox.getStyleClass().add("gameScene");
         HBox labelContainer = new HBox();
         labelContainer.setPadding(new Insets(5));
 
         // Create and configure the score and lives display
         scoreLabel = new Label("Score: " + this.gameboard.pacman.getScore());
+        scoreLabel.getStyleClass().add("gameHUD");
         scoreLabel.setMinHeight(LABEL_AREA_HEIGHT);
         scoreLabel.setAlignment(Pos.CENTER);
 
         livesLabel = new Label("Lives: " + this.gameboard.pacman.getLives());
+        livesLabel.getStyleClass().add("gameHUD");
         livesLabel.setMinHeight(LABEL_AREA_HEIGHT);
         livesLabel.setAlignment(Pos.CENTER);
 
         Pane spacer = new Pane();
         HBox.setHgrow(spacer, javafx.scene.layout.Priority.ALWAYS);
         labelContainer.getChildren().addAll(scoreLabel, spacer, livesLabel);
-        root.getChildren().addAll(labelContainer, this.gameboard.getGameBoard());
+        gameVBox.getChildren().addAll(labelContainer, this.gameboard.getGameBoard());
 
         //Create Scene and set style
-        Scene scene = new Scene(root, Gameboard.GRID_WIDTH*Gameboard.TILE_SIZE, (Gameboard.GRID_HEIGHT*Gameboard.TILE_SIZE) +LABEL_AREA_HEIGHT);
+        Scene scene = new Scene(gameVBox, Gameboard.GRID_WIDTH*Gameboard.TILE_SIZE, (Gameboard.GRID_HEIGHT*Gameboard.TILE_SIZE) +LABEL_AREA_HEIGHT);
         scene.getStylesheets().add("styles.css"); // Apply external CSS
         scene.setOnKeyPressed(event -> this.gameboard.pacman.handleInput(event.getCode()));
 

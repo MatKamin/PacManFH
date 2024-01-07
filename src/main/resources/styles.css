@@ -1,8 +1,61 @@
-.root {
+.gameScene {
     -fx-background-color: black;
 }
 
-.label {
+.gameHUD {
     -fx-text-fill: white;
     -fx-font-size: 28px;
+}
+
+
+/**
+    MENU
+ */
+
+.borderPane {
+    -fx-background-color: #1919A6;
+}
+
+.title {
+    -fx-font-family: 'PacFont';
+    -fx-font-size: 96px;
+    -fx-fill: #FFFF00;
+    -fx-effect: dropshadow( one-pass-box , black , 8 , 0.0 , 2 , 0 );
+}
+
+.titleContainer {
+    -fx-padding: 80px 0 0 0;
+}
+
+.customTextInput {
+    -fx-border-radius: 5px;
+    -fx-background-color: #1919A6;
+    -fx-border-width: 5px;
+    -fx-border-color: #2121DE;
+    -fx-font-family: 'Emulogic';
+    -fx-font-size: 20px;
+    -fx-text-fill: #FFFF00;
+    -fx-pref-width: 502px;
+    -fx-pref-height: 93px;
+    -fx-effect: dropshadow( gaussian , rgb(33, 33, 222), 7 , 0.0 , 0 , 2 );
+    -fx-margin: 10px;
+}
+
+.customButton {
+    -fx-background-color: #FFFF00;
+    -fx-font-family: 'Emulogic';
+    -fx-font-size: 42px;
+    -fx-pref-width: 502px;
+    -fx-pref-height: 93px;
+    -fx-border-radius: 5px;
+    -fx-effect: dropshadow( gaussian , rgba(255, 255, 0, 0.4) , 5 , 0.0 , 0 , 5 );
+    -fx-margin: 10px;
+}
+
+.customButton:hover {
+    -fx-background-color: rgba(255, 255, 0, 0.8);
+}
+
+.customButton:armed {
+    -fx-background-color: rgba(255, 255, 0, 0.5);
 }
