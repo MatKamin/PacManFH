@@ -25,6 +25,10 @@ public class Gameboard {
 
     //Level
     public static final char[] WALLS = {'H', 'R', 'L', 'U', 'D', 'V'};
+
+    public char[] getLevelData() {
+        return levelData;
+    }
     private char[] levelData;
 
     //Moving Objects
@@ -33,20 +37,12 @@ public class Gameboard {
     private Blinky blinky;
     private Pinky pinky;
     private Clyde clyde;
-    private List<MovingObjects> ghosts = Arrays.asList(inky, blinky, pinky, clyde);
+    private ImageView[] ghosts = new ImageView[4];
+    private MovingObjects[] ghostObjects = new MovingObjects[4];//{inky, blinky, pinky, clyde};
     //Ghosts
-    private int numberOfGhosts = 1;
-    private int[][] ghostPos;
-    private static final Random PNRG = new Random();
-    Direction[] randomDirection = {Direction.UP, Direction.UP, Direction.UP, Direction.UP};
-    boolean[] cage = {false, false, false, false};
-    private int counter;
-
-
 
     //Gameboard Constructor
     public Gameboard(String level, String skin) {
-        this.counter = 0;
         this.pacman = new Pacman(skin);
         this.blinky = new Blinky(pacman);
         this.inky = new Inky();
@@ -55,10 +51,22 @@ public class Gameboard {
         initializeImages();
         levelData = readLevel(level);
         this.gameBoard = drawMap(levelData);
+        //Spass bitte bring mich um warum is das so !=!=!!??!?!
+        InitializeArrays();
     }
-
-
-
+    /**
+     * Initialize arrays needed for
+     */
+    private void InitializeArrays() {
+        ghosts[0] = inky_img;
+        ghosts[1] = blinky_img;
+        ghosts[2] = clyde_img;
+        ghosts[3] = pinky_img;
+        ghostObjects[0] = inky;
+        ghostObjects[1] = blinky;
+        ghostObjects[2] = clyde;
+        ghostObjects[3] = pinky;
+    }
     //GameBoard Methods (includes gameboard creation, game updates and ghost movement)
     /**
      * Scales down the resource image
@@ -158,13 +166,11 @@ public class Gameboard {
      * Updates the moving Objects whenever called
      */
     public void update() {
-        moveGhost();
-        this.pacman.updateGhostPos(this.ghostPos);
         this.pacman.move(this.levelData, this.tileViews);
         tileViews = this.pacman.tileView;
         levelData = this.pacman.levelData;
+        moveGhosts();
         draw();
-        counter++;
     }
 
     /**
@@ -184,143 +190,44 @@ public class Gameboard {
         GridPane.setColumnIndex(newPacman, this.pacman.getPosX());
         current_img = newPacman;
         gameBoard.getChildren().add(current_img);
-
-        //Blinky - red
-        gameBoard.getChildren().remove(blinky_img);
-        GridPane.setRowIndex(blinky_img, ghostPos[0][1]);
-        GridPane.setColumnIndex(blinky_img, ghostPos[0][0]);
-        gameBoard.getChildren().add(blinky_img);
-
-        //Clyde - yellow
-        gameBoard.getChildren().remove(clyde_img);
-        GridPane.setRowIndex(clyde_img, ghostPos[2][1]);
-        GridPane.setColumnIndex(clyde_img, ghostPos[2][0]);
-        gameBoard.getChildren().add(clyde_img);
-
-        //blue
-        gameBoard.getChildren().remove(inky_img);
-        GridPane.setRowIndex(inky_img, ghostPos[3][1]);
-        GridPane.setColumnIndex(inky_img, ghostPos[3][0]);
-        gameBoard.getChildren().add(inky_img);
-        //pink
-        gameBoard.getChildren().remove(pinky_img);
-        GridPane.setRowIndex(pinky_img, ghostPos[1][1]);
-        GridPane.setColumnIndex(pinky_img, ghostPos[1][0]);
-        gameBoard.getChildren().add(pinky_img);
-
-    }
-
-    /**
-     * Sets pacmans initial position based on the level layout
-     */
-    public void setInitialPacmanPosition() {
-        for (int row = 0; row < GRID_HEIGHT; row++) {
-            for (int col = 0; col < GRID_WIDTH; col++) {
-                if (levelData[(row * GRID_WIDTH) + col] == 'P') {
-                    this.pacman.setPosX(col);
-                    this.pacman.setStartPosX(col);
-                    this.pacman.setPosY(row);
-                    this.pacman.setStartPosY(row);
-                    return;
-                }
-            }
+        int cnt = 0;
+        for (ImageView ghostImgView : ghosts){
+            gameBoard.getChildren().remove(ghostImgView);
+            GridPane.setRowIndex(ghostImgView, ghostObjects[cnt].posY);
+            GridPane.setColumnIndex(ghostImgView, ghostObjects[cnt].posX);
+            gameBoard.getChildren().add(ghostImgView);
+            cnt++;
         }
-    }
 
+    }
     /**
      * Sets the beginning position of the Ghosts based on the level layout
      */
     public void setInitialGhostPositions() {
-        ghostPos = new int[4][2];
-        for (int row = 0; row < GRID_HEIGHT; row++) {
-            for (int col = 0; col < GRID_WIDTH; col++) {
-                char x = levelData[(row * GRID_WIDTH) + col];
-                switch (x) {
-                    case '1':
-                        ghostPos[0][0] = col;
-                        ghostPos[0][1] = row;
-                        this.blinky.setPos(ghostPos[0][0],ghostPos[0][1]);
-                        break;
-                    case '2':
-                        ghostPos[1][0] = col;
-                        ghostPos[1][1] = row;
-                        break;
-                    case '3':
-                        ghostPos[2][0] = col;
-                        ghostPos[2][1] = row;
-                        break;
-                    case '4':
-                        ghostPos[3][0] = col;
-                        ghostPos[3][1] = row;
-                        break;
-                }
+        this.blinky.setInitialPosition(levelData);
+        this.clyde.setInitialPosition(levelData);
+        this.inky.setInitialPosition(levelData);
+        this.pinky.setInitialPosition(levelData);
+    }
+    /**
+     * Moves ghosts in the grid
+     */
+    public void moveGhosts(){
 
+        for (MovingObjects ghostobj : ghostObjects){
+            ghostobj.move(this.levelData, this.tileViews);
+            tileViews = ghostobj.tileView;
+            levelData = ghostobj.levelData;
+            if(checkIfEntityCollision(ghostobj)){
+                this.pacman.death();
             }
         }
     }
-
     /**
-     * Generates based on, in which directions the ghost can move,  a random value out of the enum Direction, except the value NONE
-     *
-     * @return the generated Direction
+     * Checks if pacman collides with a ghost
      */
-    private Direction getRandomDirection(int ghostId) {
-        List<Direction> directions = new ArrayList<>();
-        char[] fields = {levelData[((ghostPos[ghostId][1] - 1) * GRID_WIDTH) + ghostPos[ghostId][0]],
-                levelData[((ghostPos[ghostId][1] + 1) * GRID_WIDTH) + ghostPos[ghostId][0]],
-                levelData[(ghostPos[ghostId][1] * GRID_WIDTH) + ghostPos[ghostId][0] - 1],
-                levelData[(ghostPos[ghostId][1] * GRID_WIDTH) + ghostPos[ghostId][0] + 1]
-        };
-        for (int i = 0; i < fields.length; i++) {
-            if (fields[i] != 'D') {
-                directions.add(Direction.values()[i]);
-            }
-        }
-        return directions.get(PNRG.nextInt(directions.size()));
-    }
-
-    /**
-     * Moves the ghosts randomly
-     */
-    private void moveGhost() {
-        if (counter > 100 * numberOfGhosts && numberOfGhosts < ghostPos.length) {
-            numberOfGhosts++;
-        }
-        for (int i = 0; i < numberOfGhosts; i++) {
-            int nextX = ghostPos[i][0];
-            int nextY = ghostPos[i][1];
-
-            switch (randomDirection[i]) {
-                case UP -> nextY = Math.floorMod(ghostPos[i][1] - 1, GRID_HEIGHT);
-                case DOWN -> nextY = Math.floorMod(ghostPos[i][1] + 1, GRID_HEIGHT);
-                case LEFT -> nextX = Math.floorMod(ghostPos[i][0] - 1, GRID_WIDTH);
-                case RIGHT -> nextX = Math.floorMod(ghostPos[i][0] + 1, GRID_WIDTH);
-            }
-            if (this.canMove(nextX, nextY)) {
-                ghostPos[i][0] = nextX;
-                ghostPos[i][1] = nextY;
-            } else {
-                randomDirection[i] = getRandomDirection(i);
-                System.out.println(i + ": " + randomDirection[i]);
-            }
-        }
-    }
-
-    /**
-     *
-     * @param nextX next pos on X
-     * @param nextY next pos on Y
-     * @return when movement is possible returns true
-     */
-    //Duplicate because the ghost movement happens solely in this class
-    public boolean canMove(int nextX, int nextY) {
-        char positionChar = this.levelData[(nextY * GRID_WIDTH) + nextX];
-        for (char wall : WALLS) {
-            if (positionChar == wall) {
-                return false; // The position matches a wall character
-            }
-        }
-        return true; // No match found, movement is possible
+    private boolean checkIfEntityCollision(MovingObjects ghosty) {
+        return ghosty.getPosX() == pacman.getPosX() && ghosty.getPosY() == pacman.getPosY();
     }
 
     //Get the GridPane for Scene creation

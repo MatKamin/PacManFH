@@ -12,11 +12,6 @@ public class Pacman extends MovingObjects {
     private Direction desiredDirection;
     private int score;
     private int lives;
-    private int posX;
-    private int posY;
-    private int startPosX;
-    private int startPosY;
-    private int[][] ghostPos;
     private final ImageView nowall_img = new ImageView("/map/blackTile.png");
 
 
@@ -30,52 +25,31 @@ public class Pacman extends MovingObjects {
         this.edible = Edible.SMALL;
     }
 
-    //Set corresponding direction
-    public void handleInput(KeyCode keyCode) {
-        switch (keyCode) {
-            case UP -> desiredDirection = Direction.UP;
-            case DOWN -> desiredDirection = Direction.DOWN;
-            case LEFT -> desiredDirection = Direction.LEFT;
-            case RIGHT -> desiredDirection = Direction.RIGHT;
-        }
-    }
-
     //Movement
     @Override
     public void move(char[] levelData, ImageView[][] tileView) {
+
         this.levelData = levelData;
         this.tileView = tileView;
+
         if (canMoveInDirection(desiredDirection)) {
             direction = desiredDirection;
         }
-
-        int nextX = posX;
-        int nextY = posY;
-
-        switch (direction) {
-            case UP -> nextY = Math.floorMod(posY - 1, Gameboard.GRID_HEIGHT);
-            case DOWN -> nextY = Math.floorMod(posY + 1, Gameboard.GRID_HEIGHT);
-            case LEFT -> nextX = Math.floorMod(posX - 1, Gameboard.GRID_WIDTH);
-            case RIGHT -> nextX = Math.floorMod(posX + 1, Gameboard.GRID_WIDTH);
-        }
-
-        if (canMove(nextX, nextY)) {
-            char nextPos = this.levelData[(nextY * Gameboard.GRID_WIDTH) + nextX];
-            if (nextPos != 'E') {
-                switch(nextPos) {
-                    case 'B' -> edible = Edible.SMALL;
-                    case 'S' -> edible = Edible.BIG;
-                    case 'F' -> edible = Edible.CHERRY;
-                }
-                eat(nextX, nextY);
+        setNextPos();
+        char nextPos = this.levelData[(this.posY * Gameboard.GRID_WIDTH) + this.posX];
+        if (nextPos != 'E') {
+            switch(nextPos) {
+                case 'B' -> edible = Edible.SMALL;
+                case 'S' -> edible = Edible.BIG;
+                case 'F' -> edible = Edible.CHERRY;
             }
-            posX = nextX;
-            posY = nextY;
+            eat(this.posX, this.posY);
         }
-        death(this.ghostPos);
+        //death(this.ghostPos);
     }
 
     private boolean canMoveInDirection(Direction direction) {
+
         int nextX = posX;
         int nextY = posY;
 
@@ -93,28 +67,33 @@ public class Pacman extends MovingObjects {
     }
 
     /**
+     * Handles keyboard input to change the direction of Pacman.
+     *
+     * @param keyCode The KeyCode of the pressed key.
+     */
+    public void handleInput(KeyCode keyCode) {
+        switch (keyCode) {
+            case UP,W -> desiredDirection = Direction.UP;
+            case DOWN,S -> desiredDirection = Direction.DOWN;
+            case LEFT,A -> desiredDirection = Direction.LEFT;
+            case RIGHT,D -> desiredDirection = Direction.RIGHT;
+        }
+    }
+
+    /**
      * Checks if the Ghosts hit Pacman
      * Deducts one live if true
      * Are no lives left then game over
      */
-    private void death(int[][] ghostPos) {
-        for (int i = 0; i < ghostPos.length; i++) {
-            if (ghostPos[i][0] == this.posX && ghostPos[i][1] == this.posY) {
-                try {
-                    System.out.println("P: " + this.posX + " " + this.posY + " G" + i + ": " + ghostPos[i][0] + " " + ghostPos[i][1]);
-                    if (lives > 1) {
-                        this.lives -= 1;
-                        this.posX = startPosX;
-                        this.posY = startPosY;
-                    }
-                    else Platform.exit();
-                } catch (Exception e) {
-                    System.out.println(e.getMessage());
-                }
-            }
-        }
-    }
 
+    public void death() {
+        if (lives > 1) {
+            this.lives -= 1;
+            this.posX = startPosX;
+            this.posY = startPosY;
+        }
+        else Platform.exit();
+    }
 
 
     /**
@@ -147,32 +126,4 @@ public class Pacman extends MovingObjects {
         return this.lives;
     }
 
-    public int getPosX() {
-        return this.posX;
-    }
-
-    public int getPosY() {
-        return this.posY;
-    }
-
-    //Set-Methods
-    public void setPosX(int newPosX) {
-        this.posX = newPosX;
-    }
-
-    public void setPosY(int newPosY) {
-        this.posY = newPosY;
-    }
-
-    public void updateGhostPos(int[][] newPos) {
-        this.ghostPos = newPos;
-    }
-
-    public void setStartPosX(int newPosX) {
-        this.startPosX = newPosX;
-    }
-
-    public void setStartPosY(int newPosY) {
-        this.startPosY = newPosY;
-    }
 }

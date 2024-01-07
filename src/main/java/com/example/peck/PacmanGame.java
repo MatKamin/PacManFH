@@ -66,7 +66,7 @@ public class PacmanGame {
 
 
     public void startGame() {
-        this.gameboard.setInitialPacmanPosition();
+        this.gameboard.pacman.setInitialPosition(this.gameboard.getLevelData());
         this.gameboard.setInitialGhostPositions();
         Timeline gameLoop = new Timeline(new KeyFrame(Duration.millis(150), e -> gameUpdate()));
         gameLoop.setCycleCount(Timeline.INDEFINITE);
