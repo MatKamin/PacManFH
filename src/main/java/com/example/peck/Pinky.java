@@ -10,6 +10,13 @@ public class Pinky extends MovingObjects {
     }
 
     @Override
-    public void move(char[] levelData, ImageView[][] tileView) {}
+    public void move(char[] levelData, ImageView[][] tileView) {
+
+        this.levelData = levelData;
+        this.tileView = tileView;
+
+        this.direction = getRandomDirection();
+        setNextPos();
+    }
 
 }

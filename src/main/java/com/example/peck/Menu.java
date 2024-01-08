@@ -31,6 +31,8 @@ public class Menu extends Application {
     private static String levelFile = "/level.txt";
     private static String skinFolder = "standard";
     private static String loggedInUsername = "";
+    private static boolean SPLASH_ENABLED = true;
+
     public Font pacmanFont = Font.loadFont(getClass().getResourceAsStream("/fonts/pacman.TTF"), 48);
     public Font emulogicFont = Font.loadFont(getClass().getResourceAsStream("/fonts/emulogic.ttf"), 48);
 
@@ -38,47 +40,57 @@ public class Menu extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         DatabaseHelper.initDB();
-        // Create the splash layout
-        StackPane splashLayout = new StackPane();
-        splashLayout.setAlignment(Pos.CENTER);
 
-        // Load the first GIF
-        Image firstGifImage = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/splashscreen/pacman_chasing.gif")));
-        ImageView gifView = new ImageView(firstGifImage);
-        splashLayout.getChildren().add(gifView);
+        if (!SPLASH_ENABLED) {
+            // Create the splash layout
+            StackPane splashLayout = new StackPane();
+            splashLayout.setAlignment(Pos.CENTER);
 
-        // Create the splash stage
-        Stage splashStage = new Stage();
-        Scene splashScene = new Scene(splashLayout, 480, 106);
-        splashStage.setScene(splashScene);
-        splashStage.initStyle(StageStyle.UNDECORATED); // Set the splash stage to be undecorated
-        splashStage.show();
+            // Load the first GIF
+            Image firstGifImage = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/splashscreen/pacman_chasing.gif")));
+            ImageView gifView = new ImageView(firstGifImage);
+            splashLayout.getChildren().add(gifView);
 
-        // Timeline for controlling the GIF display durations
-        Timeline timeline = new Timeline(
-                // Pause for the duration of the first GIF
-                new KeyFrame(Duration.millis(4000), e -> {
-                    // Load the second GIF
-                    Image secondGifImage = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/splashscreen/pacman_being_chased.gif")));
-                    gifView.setImage(secondGifImage);
-                }),
+            // Create the splash stage
+            Stage splashStage = new Stage();
+            Scene splashScene = new Scene(splashLayout, 480, 106);
+            splashStage.setScene(splashScene);
+            splashStage.initStyle(StageStyle.UNDECORATED); // Set the splash stage to be undecorated
+            splashStage.show();
 
-                // Pause for the duration of the second GIF
-                new KeyFrame(Duration.millis(4000 + 4040), e -> {
-                    // Close the splash stage
-                    splashStage.close();
+            // Timeline for controlling the GIF display durations
+            Timeline timeline = new Timeline(
+                    // Pause for the duration of the first GIF
+                    new KeyFrame(Duration.millis(4000), e -> {
+                        // Load the second GIF
+                        Image secondGifImage = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/splashscreen/pacman_being_chased.gif")));
+                        gifView.setImage(secondGifImage);
+                    }),
 
-                    // Now set up the main menu stage
-                    primaryStage.setScene(createMenu(primaryStage, null));
-                    primaryStage.setTitle("Pac-Man 2.0");
-                    primaryStage.setResizable(false);
-                    primaryStage.initStyle(StageStyle.DECORATED); // Make sure the main menu has decorations
-                    primaryStage.show();
-                })
-        );
+                    // Pause for the duration of the second GIF
+                    new KeyFrame(Duration.millis(4000 + 4040), e -> {
+                        // Close the splash stage
+                        splashStage.close();
 
-        // Play the timeline
-        timeline.play();
+                        // Now set up the main menu stage
+                        primaryStage.setScene(createMenu(primaryStage, null));
+                        primaryStage.setTitle("Pac-Man 2.0");
+                        primaryStage.setResizable(false);
+                        primaryStage.initStyle(StageStyle.DECORATED); // Make sure the main menu has decorations
+                        primaryStage.show();
+                    })
+            );
+
+            // Play the timeline
+            timeline.play();
+        } else {
+            primaryStage.setScene(createMenu(primaryStage, null));
+            primaryStage.setTitle("Pac-Man 2.0");
+            primaryStage.setResizable(false);
+            primaryStage.initStyle(StageStyle.DECORATED); // Make sure the main menu has decorations
+            primaryStage.show();
+        }
+
     }
 
     /**
