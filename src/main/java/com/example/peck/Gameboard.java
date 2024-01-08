@@ -40,14 +40,17 @@ public class Gameboard {
     private ImageView[] ghosts = new ImageView[4];
     private MovingObjects[] ghostObjects = new MovingObjects[4];//{inky, blinky, pinky, clyde};
     //Ghosts
+    private int ghostnumber=1;
+
+    private int counter=0;
 
     //Gameboard Constructor
     public Gameboard(String level, String skin) {
         this.pacman = new Pacman(skin);
         this.blinky = new Blinky(pacman);
-        this.inky = new Inky();
-        this.clyde = new Clyde();
-        this.pinky = new Pinky();
+        this.inky = new Inky(pacman);
+        this.clyde = new Clyde(pacman);
+        this.pinky = new Pinky(pacman);
         initializeImages();
         levelData = readLevel(level);
         this.gameBoard = drawMap(levelData);
@@ -171,6 +174,10 @@ public class Gameboard {
         levelData = this.pacman.levelData;
         moveGhosts();
         draw();
+        counter++;
+        if(counter%(25*ghostnumber)==0 && ghostnumber<ghostObjects.length){
+            ghostnumber++;
+        }
     }
 
     /**
@@ -214,11 +221,11 @@ public class Gameboard {
      */
     public void moveGhosts(){
 
-        for (MovingObjects ghostobj : ghostObjects){
-            ghostobj.move(this.levelData, this.tileViews);
-            tileViews = ghostobj.tileView;
-            levelData = ghostobj.levelData;
-            if(checkIfEntityCollision(ghostobj)){
+        for (int i=0;i<ghostnumber;i++){
+            ghostObjects[i].move(this.levelData, this.tileViews);
+            tileViews = ghostObjects[i].tileView;
+            levelData = ghostObjects[i].levelData;
+            if(checkIfEntityCollision(ghostObjects[i])){
                 this.pacman.death();
             }
         }
