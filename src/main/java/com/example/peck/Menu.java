@@ -32,6 +32,7 @@ public class Menu extends Application {
     private static String skinFolder = "standard";
     private static String loggedInUsername = "";
     private static boolean SPLASH_ENABLED = true;
+    public static Scene menuScene;
 
     public Font pacmanFont = Font.loadFont(getClass().getResourceAsStream("/fonts/pacman.TTF"), 48);
     public Font emulogicFont = Font.loadFont(getClass().getResourceAsStream("/fonts/emulogic.ttf"), 48);
@@ -242,6 +243,7 @@ public class Menu extends Application {
                 // Registration successful
                 loggedInUsername = usernameField.getText();
                 Scene mainScene = openMainWindow(stage);
+                menuScene = mainScene;
                 stage.setScene(mainScene);
             } else {
                 // Registration failed, show error message to the user
@@ -298,7 +300,7 @@ public class Menu extends Application {
 
 
         playButton.setOnAction(event -> {
-            PacmanGame pacmanGame = new PacmanGame(levelFile, skinFolder);
+            PacmanGame pacmanGame = new PacmanGame(levelFile, skinFolder, stage);
             stage.setScene(pacmanGame.getGameView());
             pacmanGame.startGame();
         });
@@ -369,6 +371,7 @@ public class Menu extends Application {
             if (loginSuccess) {
                 loggedInUsername = usernameField.getText();
                 Scene mainScene = openMainWindow(stage);
+                menuScene = mainScene;
                 stage.setScene(mainScene);
             } else {
                 // Login failed, show error message

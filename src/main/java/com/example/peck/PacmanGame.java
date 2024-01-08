@@ -9,12 +9,14 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 import javafx.util.Duration;
 
 public class PacmanGame {
 
     //Scene Elements
     private static final int LABEL_AREA_HEIGHT = 40;
+    public static Timeline timeline;
 
 
     //Game State
@@ -25,12 +27,14 @@ public class PacmanGame {
     //Components
     private final Gameboard gameboard;
     private final Scene gameView;
+    private final Stage stage;
 
 
     //Constructor for a new game
-    public PacmanGame(String level, String skin) {
+    public PacmanGame(String level, String skin, Stage stage) {
         this.gameboard = new Gameboard(level, skin);
         this.gameView = initializeScene();
+        this.stage = stage;
     }
 
     private Scene initializeScene() {
@@ -70,12 +74,13 @@ public class PacmanGame {
         this.gameboard.setInitialGhostPositions();
         Timeline gameLoop = new Timeline(new KeyFrame(Duration.millis(150), e -> gameUpdate()));
         gameLoop.setCycleCount(Timeline.INDEFINITE);
+        timeline = gameLoop;
         gameLoop.play();
     }
 
     private void gameUpdate() {
         updateLabels();
-        this.gameboard.update();
+        this.gameboard.update(stage);
     }
 
     private void updateLabels() {

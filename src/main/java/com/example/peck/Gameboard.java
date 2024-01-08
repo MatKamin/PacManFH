@@ -1,8 +1,18 @@
 package com.example.peck;
 
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
+import javafx.stage.Stage;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -22,6 +32,8 @@ public class Gameboard {
     private ImageView pacmanUp_img, pacmanDown_img, pacmanLeft_img, pacmanRight_img, current_img,
             bigdot_img, smalldot_img, nowall_img, blinky_img, pinky_img, clyde_img, inky_img,
             railHorizontal_img, railUpRight_img, railUpLeft_img, railRightUp_img, railLeftUp_img, cherries_img, railVertical_img;
+
+    public Font winFont = Font.loadFont(getClass().getResourceAsStream("/fonts/emulogic.ttf"), 64);
 
     //Level
     public static final char[] WALLS = {'H', 'R', 'L', 'U', 'D', 'V'};
@@ -168,16 +180,74 @@ public class Gameboard {
     /**
      * Updates the moving Objects whenever called
      */
-    public void update() {
+    public void update(Stage stage) {
         this.pacman.move(this.levelData, this.tileViews);
         tileViews = this.pacman.tileView;
         levelData = this.pacman.levelData;
         moveGhosts();
+
+        // Check if Pac-Man won
+        if (won()) {
+            stage.setScene(winScreen(stage));
+        }
+
         draw();
         counter++;
         if(counter%(25*ghostnumber)==0 && ghostnumber<ghostObjects.length){
             ghostnumber++;
         }
+    }
+
+    /**
+     * This Method checks if Pac-Man has already won!
+     * @return true: if all dots are eaten
+     * @return false: if there are still dots left
+     */
+    private boolean won() {
+        for (int i = 0; i < tileViews.length; i++) {
+            for (int j = 0; j < tileViews[i].length; j++) {
+                String fullUrl = tileViews[i][j].getImage().getUrl();
+                String url = fullUrl.substring(fullUrl.lastIndexOf("/") + 1);
+                if (url.equals("bigDot.png") || url.equals("smallDot.png")) return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * This Method creates the Win-Scene, which is shown when the Player wins
+     * @param stage The stage in which the scene is shown
+     * @return the finished scene which is shown
+     */
+    private Scene winScreen(Stage stage) {
+        PacmanGame.timeline.stop();
+        BorderPane borderPane = new BorderPane();
+        borderPane.getStyleClass().add("win");
+
+        Text text = new Text("You Win!");
+        text.setFont(winFont);
+        text.setFill(Color.YELLOW);
+
+        Button menuButton = new Button("Go back");
+        menuButton.setFont(winFont);
+        menuButton.getStyleClass().add("customButton");
+
+        VBox buttonBox = new VBox(100);
+        buttonBox.getChildren().addAll(text, menuButton);
+        buttonBox.setAlignment(Pos.CENTER);
+        borderPane.setCenter(buttonBox);
+
+        Scene winScene = new Scene(borderPane, GRID_WIDTH * TILE_SIZE, (GRID_HEIGHT * TILE_SIZE) + 40);
+
+        winScene.getStylesheets().add("styles.css");
+
+        menuButton.setOnAction(event -> {
+            System.out.println("drinnen!-----------------------");
+            stage.setScene(Menu.menuScene);
+        });
+
+        return winScene;
     }
 
     /**
