@@ -208,6 +208,8 @@ public class Menu extends Application {
         registerScene.setOnKeyPressed(event -> {
             if (event.getCode() == KeyCode.ESCAPE) {
                 stage.setScene(previousScene);
+            } else if (event.getCode() == KeyCode.ENTER) {
+                confirmButton.fire();
             }
         });
 
@@ -377,6 +379,8 @@ public class Menu extends Application {
         loginScene.setOnKeyPressed(event -> {
             if (event.getCode() == KeyCode.ESCAPE) {
                 stage.setScene(previousScene);
+            } else if (event.getCode() == KeyCode.ENTER) {
+                confirmButton.fire();
             }
         });
 
