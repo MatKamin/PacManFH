@@ -13,6 +13,8 @@ public class Pacman extends MovingObjects {
     private int score;
     private int lives;
     private final ImageView nowall_img = new ImageView("/map/blackTile.png");
+    private final ImageView cherries_img = new ImageView("/map/cherry.png");
+    public int dotsEaten = 0;
 
 
     //Constructor
@@ -103,10 +105,17 @@ public class Pacman extends MovingObjects {
      * @param y y coordinate
      */
     private void eat(int x, int y) {
+        dotsEaten++;
         updateScore();
         levelData[(y * Gameboard.GRID_WIDTH) + x] = 'E'; // Replace the SMALLDOT with empty space
         ImageView tileView = this.tileView[y][x];
         tileView.setImage(nowall_img.getImage()); // Update the image to nowall
+    }
+
+    public void placeFood() {
+        levelData[(17 * Gameboard.GRID_WIDTH) + 14] = 'F'; // Replace the SMALLDOT with empty space
+        ImageView tileView = this.tileView[17][14];
+        tileView.setImage(cherries_img.getImage()); // Update the image to nowall
     }
 
     //Get-Methods

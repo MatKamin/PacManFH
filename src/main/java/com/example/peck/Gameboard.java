@@ -191,6 +191,10 @@ public class Gameboard {
             stage.setScene(winScreen(stage));
         }
 
+        if (this.pacman.dotsEaten == 75 || this.pacman.dotsEaten == 175) {
+            placeFood();
+        }
+
         draw();
         counter++;
         if(counter%(25*ghostnumber)==0 && ghostnumber<ghostObjects.length){
@@ -243,11 +247,23 @@ public class Gameboard {
         winScene.getStylesheets().add("styles.css");
 
         menuButton.setOnAction(event -> {
-            System.out.println("drinnen!-----------------------");
             stage.setScene(Menu.menuScene);
         });
 
         return winScene;
+    }
+
+    /**
+     * This Method trys to place a cherry on the field [17][14]
+     * Only if the field is empty, a cherry is placed
+     */
+    private void placeFood() {
+        String fullUrl = tileViews[17][14].getImage().getUrl();
+        String url = fullUrl.substring(fullUrl.lastIndexOf("/") + 1);
+
+        if (url.equals("blackTile.png")) {
+            this.pacman.placeFood();
+        }
     }
 
     /**
