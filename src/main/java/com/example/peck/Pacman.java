@@ -3,6 +3,10 @@ package com.example.peck;
 import javafx.application.Platform;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
+
+import java.io.File;
 
 public class Pacman extends MovingObjects {
 
@@ -106,6 +110,13 @@ public class Pacman extends MovingObjects {
      */
     private void eat(int x, int y) {
         dotsEaten++;
+
+        // Sound
+        Media chomp = new Media(new File("src/main/resources/sounds/chomp.mp3").toURI().toString());
+        MediaPlayer chompPlayer = new MediaPlayer(chomp);
+        chompPlayer.play();
+
+
         updateScore();
         levelData[(y * Gameboard.GRID_WIDTH) + x] = 'E'; // Replace the SMALLDOT with empty space
         ImageView tileView = this.tileView[y][x];
