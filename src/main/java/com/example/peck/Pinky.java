@@ -13,6 +13,7 @@ public class Pinky extends MovingObjects {
 
     private int[] scatterPoint = {0, 0};
 
+
     public Pinky(Pacman pm) {
         super("ghosts/pinky.gif");
         this.correspondingChar = '2';
@@ -22,6 +23,7 @@ public class Pinky extends MovingObjects {
     //Pinky´s target is always 4 tiles ahead of Packman
     @Override
     public void move(char[] levelData, ImageView[][] tileView) {
+
         this.levelData = levelData;
         this.tileView = tileView;
 
@@ -39,17 +41,22 @@ public class Pinky extends MovingObjects {
         }
     }
 
-    // Updates the target of Pinky.
+    // Updates the target of Pinky or his scatter point, if the scatter mode is on
     private void updateTarget() {
-        this.targetX = pacMan.posX;
-        this.targetY = pacMan.posY;
-        Direction direction1 = pacMan.direction;
-        switch (direction1) {
-            case UP -> this.targetY -= 4;
-            case DOWN -> this.targetY += 4;
-            case LEFT -> this.targetX -= 4;
-            case RIGHT -> this.targetX += 4;
+        if (!pacMan.scatterMode) {
+            this.targetX = pacMan.posX;
+            this.targetY = pacMan.posY;
+            Direction direction1 = pacMan.direction;
+            switch (direction1) {
+                case UP -> this.targetY -= 4;
+                case DOWN -> this.targetY += 4;
+                case LEFT -> this.targetX -= 4;
+                case RIGHT -> this.targetX += 4;
 
+            }
+        } else {
+            this.targetX = scatterPoint[0];
+            this.targetY = scatterPoint[1];
         }
     }
 

@@ -11,14 +11,18 @@ import java.io.File;
 public class Pacman extends MovingObjects {
 
     //Pacman Attributes
-    private enum Edible {SMALL, BIG, CHERRY}
-    private Edible edible;
+    public enum Edible {SMALL, BIG, CHERRY, GHOST}
+    public Edible edible;
     private Direction desiredDirection;
     private int score;
     private int lives;
     private final ImageView nowall_img = new ImageView("/map/blackTile.png");
     private final ImageView cherries_img = new ImageView("/map/cherry.png");
     public int dotsEaten = 0;
+
+    public boolean scatterMode= false;
+
+    public int scatterTimer=0;
 
 
     //Constructor
@@ -121,6 +125,11 @@ public class Pacman extends MovingObjects {
         levelData[(y * Gameboard.GRID_WIDTH) + x] = 'E'; // Replace the SMALLDOT with empty space
         ImageView tileView = this.tileView[y][x];
         tileView.setImage(nowall_img.getImage()); // Update the image to nowall
+
+        if(edible== Edible.BIG){
+            scatterMode=true;
+            scatterTimer=30;
+        }
     }
 
     public void placeFood() {
@@ -130,11 +139,12 @@ public class Pacman extends MovingObjects {
     }
 
     //Get-Methods
-    private void updateScore() {
+    public void updateScore() {
         switch (this.edible) {
             case SMALL -> score++;
             case BIG -> score += 10;
             case CHERRY -> score += 100;
+            case GHOST -> score +=50;
         }
     }
 

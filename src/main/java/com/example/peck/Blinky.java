@@ -10,6 +10,7 @@ public class Blinky extends MovingObjects {
     private int firstMoves = 3;
     private int[] scatterPoint = {31, 0};
 
+
     public Blinky(Pacman pm) {
         super("ghosts/blinky.gif");
         this.correspondingChar = '1';
@@ -37,10 +38,15 @@ public class Blinky extends MovingObjects {
         }
     }
 
-    // Update Blinky target position to Pacman's current position
+    // Update Blinky target position to Pacman's current position or his scatter point, if the scatter mode is on
     private void updateTarget() {
-        this.targetX = pacMan.getPosX();
-        this.targetY = pacMan.getPosY();
+        if (!pacMan.scatterMode) {
+            this.targetX = pacMan.getPosX();
+            this.targetY = pacMan.getPosY();
+        } else {
+            this.targetX = scatterPoint[0];
+            this.targetY = scatterPoint[1];
+        }
     }
 
     // Calculate the best move using Pythagorean theorem

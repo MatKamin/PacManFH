@@ -185,6 +185,7 @@ public class Gameboard {
         this.pacman.move(this.levelData, this.tileViews);
         tileViews = this.pacman.tileView;
         levelData = this.pacman.levelData;
+
         moveGhosts();
 
         // Check if Pac-Man won
@@ -200,6 +201,15 @@ public class Gameboard {
         counter++;
         if(counter%(40*ghostnumber)==0 && ghostnumber<ghostObjects.length){
             ghostnumber++;
+        }
+        //Timer for Scatter mode
+        if(pacman.scatterTimer>=0){
+            if(pacman.scatterTimer==0){
+                pacman.scatterMode=false;
+            }
+            else {
+                pacman.scatterTimer--;
+            }
         }
     }
 
@@ -313,13 +323,29 @@ public class Gameboard {
             tileViews = ghostObjects[i].tileView;
             levelData = ghostObjects[i].levelData;
             if(checkIfEntityCollision(ghostObjects[i])){
-                this.pacman.death();
-                this.blinky.death();
-                this.clyde.death();
-                this.pinky.death();
-                this.inky.death();
-                this.ghostnumber=1;
-                this.counter=0;
+                if(!pacman.scatterMode) {
+                    this.pacman.death();
+                    this.blinky.death();
+                    this.clyde.death();
+                    this.pinky.death();
+                    this.inky.death();
+                    this.ghostnumber = 1;
+                    this.counter = 0;
+                }
+                else {
+                    switch (i){
+                        case 0: this.blinky.death();
+                        break;
+                        case 1: this.inky.death();
+                            break;
+                        case 2: this.clyde.death();
+                            break;
+                        case 3: this.pinky.death();
+                            break;
+                    }
+                    this.pacman.edible= Pacman.Edible.GHOST;
+                    this.pacman.updateScore();
+                }
             }
         }
     }

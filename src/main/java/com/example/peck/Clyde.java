@@ -46,16 +46,21 @@ public class Clyde extends MovingObjects {
         }
     }
 
-    // Update Clyde´s target position
+    // Update Clyde´s target position or his scatter point, if the scatter mode is on
     private void updateTarget() {
-        int distancePacManX = Math.abs(Math.abs(this.posX - pacMan.posX));
-        int distancePacManY = Math.abs(Math.abs(this.posY - pacMan.posY));
-        if (distancePacManX <= 8 && distancePacManY <= 8) {
+        if (!pacMan.scatterMode) {
+            int distancePacManX = Math.abs(Math.abs(this.posX - pacMan.posX));
+            int distancePacManY = Math.abs(Math.abs(this.posY - pacMan.posY));
+            if (distancePacManX <= 8 && distancePacManY <= 8) {
+                this.targetX = scatterPoint[0];
+                this.targetY = scatterPoint[1];
+            } else {
+                this.targetX = pacMan.getPosX();
+                this.targetY = pacMan.getPosY();
+            }
+        } else {
             this.targetX = scatterPoint[0];
             this.targetY = scatterPoint[1];
-        } else {
-            this.targetX = pacMan.getPosX();
-            this.targetY = pacMan.getPosY();
         }
     }
 

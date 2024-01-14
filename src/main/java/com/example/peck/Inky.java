@@ -15,6 +15,7 @@ public class Inky extends MovingObjects {
 
     private int firstMoves = 2;
 
+
     public Inky(Pacman pm, Blinky blinky) {
         super("ghosts/inky.gif");
         this.correspondingChar = '4';
@@ -25,7 +26,7 @@ public class Inky extends MovingObjects {
     //Inky´s target is the diagonal times two from Blinky to PacMan´s position plus 2
     @Override
     public void move(char[] levelData, ImageView[][] tileView) {
-        this.levelData = levelData;
+               this.levelData = levelData;
         this.tileView = tileView;
 
         //Prevents the ghost from staying in the box
@@ -42,24 +43,28 @@ public class Inky extends MovingObjects {
         }
     }
 
-    // Update Inky´s target position
+    // Update Inky´s target position or his scatter point, if the scatter mode is on
     private void updateTarget() {
-        this.targetX = pacMan.posX;
-        this.targetY = pacMan.posY;
-        Direction direction1 = pacMan.direction;
-        switch (direction1) {
-            case UP -> this.targetY -= 2;
-            case DOWN -> this.targetY += 2;
-            case LEFT -> this.targetX -= 2;
-            case RIGHT -> this.targetX += 2;
+        if (!pacMan.scatterMode) {
+            this.targetX = pacMan.posX;
+            this.targetY = pacMan.posY;
+            Direction direction1 = pacMan.direction;
+            switch (direction1) {
+                case UP -> this.targetY -= 2;
+                case DOWN -> this.targetY += 2;
+                case LEFT -> this.targetX -= 2;
+                case RIGHT -> this.targetX += 2;
 
+            }
+            int difX = Math.abs(Math.abs(blinky.posX - targetX));
+            int difY = Math.abs(Math.abs(blinky.posY - targetY));
+
+            this.targetX += difX;
+            this.targetY += difY;
+        } else {
+            this.targetX = scatterPoint[0];
+            this.targetY = scatterPoint[1];
         }
-        int difX = Math.abs(Math.abs(blinky.posX - targetX));
-        int difY = Math.abs(Math.abs(blinky.posY - targetY));
-
-        this.targetX += difX;
-        this.targetY += difY;
-
     }
 
     // Calculate the best move using Pythagorean theorem
