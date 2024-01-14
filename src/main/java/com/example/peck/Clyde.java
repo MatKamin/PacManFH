@@ -14,28 +14,49 @@ public class Clyde extends MovingObjects {
     private int targetX;
     private int targetY;
 
-    Random random=new Random();
+    private int firstMoves = 2;
+
+    private int[] scatterPoint = {0, 31};
+
+    Random random = new Random();
+
     public Clyde(Pacman pm) {
         super("ghosts/clyde.gif");
         this.correspondingChar = '3';
         this.pacMan = pm;
     }
 
+    //Clyde has to different movement modes. If he is within 8 tiles to Pacman he goes to his fixed Scatter Point. If not he as the same targeting method as Blinky (Pacman´s position)
     @Override
     public void move(char[] levelData, ImageView[][] tileView) {
         this.levelData = levelData;
         this.tileView = tileView;
 
-        updateTarget(); // Update target position every move
-        calculateBestMove(); // Calculate the best move using Pythagorean theorem
+        //Prevents the ghost from staying in the box
+        if (firstMoves > 0) {
+            this.direction = Direction.UP;
+            setNextPos();
+            firstMoves--;
+        } else {
 
-        setNextPos(); // Set the next position based on the best move
+            updateTarget(); // Update target position every move
+            calculateBestMove(); // Calculate the best move using Pythagorean theorem
+
+            setNextPos(); // Set the next position based on the best move
+        }
     }
 
-    // Update Blinky target position to Pacman's current position
+    // Update Clyde´s target position
     private void updateTarget() {
-        this.targetX = pacMan.getPosX()+random.nextInt(20);
-        this.targetY = pacMan.getPosY()+random.nextInt(20);
+        int distancePacManX = Math.abs(Math.abs(this.posX - pacMan.posX));
+        int distancePacManY = Math.abs(Math.abs(this.posY - pacMan.posY));
+        if (distancePacManX <= 8 && distancePacManY <= 8) {
+            this.targetX = scatterPoint[0];
+            this.targetY = scatterPoint[1];
+        } else {
+            this.targetX = pacMan.getPosX();
+            this.targetY = pacMan.getPosY();
+        }
     }
 
     // Calculate the best move using Pythagorean theorem
@@ -64,6 +85,11 @@ public class Clyde extends MovingObjects {
             // Calculate distance using Pythagorean theorem
             double distance = Math.sqrt(Math.pow(nextX - targetX, 2) + Math.pow(nextY - targetY, 2));
 
+            // Checks if the next field is not the box, if true skip this direction
+            if ((nextX == 14 && nextY == 12) || (nextX == 15 && nextY == 12)) {
+                continue;
+            }
+
             // Check if movement is possible and if the calculated distance is shorter
             if (canMove(nextX, nextY) && distance < shortestDistance) {
                 shortestDistance = distance;
@@ -80,5 +106,12 @@ public class Clyde extends MovingObjects {
                 (newDirection == Direction.DOWN && currentDirection == Direction.UP) ||
                 (newDirection == Direction.LEFT && currentDirection == Direction.RIGHT) ||
                 (newDirection == Direction.RIGHT && currentDirection == Direction.LEFT);
+    }
+
+    //Sets the ghost position to his starting position
+    public void death() {
+        this.posX = startPosX;
+        this.posY = startPosY;
+        firstMoves = 2;
     }
 }

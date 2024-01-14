@@ -61,7 +61,7 @@ public class Gameboard {
     public Gameboard(String level, String skin) {
         this.pacman = new Pacman(skin);
         this.blinky = new Blinky(pacman);
-        this.inky = new Inky(pacman);
+        this.inky = new Inky(pacman, blinky);
         this.clyde = new Clyde(pacman);
         this.pinky = new Pinky(pacman);
         initializeImages();
@@ -74,12 +74,12 @@ public class Gameboard {
      * Initialize arrays needed for
      */
     private void InitializeArrays() {
-        ghosts[0] = inky_img;
-        ghosts[1] = blinky_img;
+        ghosts[0] = blinky_img;
+        ghosts[1] =  inky_img;
         ghosts[2] = clyde_img;
         ghosts[3] = pinky_img;
-        ghostObjects[0] = inky;
-        ghostObjects[1] = blinky;
+        ghostObjects[0] = blinky;
+        ghostObjects[1] = inky;
         ghostObjects[2] = clyde;
         ghostObjects[3] = pinky;
     }
@@ -198,7 +198,7 @@ public class Gameboard {
 
         draw();
         counter++;
-        if(counter%(25*ghostnumber)==0 && ghostnumber<ghostObjects.length){
+        if(counter%(40*ghostnumber)==0 && ghostnumber<ghostObjects.length){
             ghostnumber++;
         }
     }
@@ -314,6 +314,12 @@ public class Gameboard {
             levelData = ghostObjects[i].levelData;
             if(checkIfEntityCollision(ghostObjects[i])){
                 this.pacman.death();
+                this.blinky.death();
+                this.clyde.death();
+                this.pinky.death();
+                this.inky.death();
+                this.ghostnumber=1;
+                this.counter=0;
             }
         }
     }

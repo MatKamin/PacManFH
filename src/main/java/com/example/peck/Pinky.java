@@ -9,27 +9,48 @@ public class Pinky extends MovingObjects {
     private int targetX;
     private int targetY;
 
+    private int firstMoves = 3;
+
+    private int[] scatterPoint = {0, 0};
+
     public Pinky(Pacman pm) {
         super("ghosts/pinky.gif");
         this.correspondingChar = '2';
         this.pacMan = pm;
     }
 
+    //Pinky´s target is always 4 tiles ahead of Packman
     @Override
     public void move(char[] levelData, ImageView[][] tileView) {
         this.levelData = levelData;
         this.tileView = tileView;
 
-        updateTarget(); // Update target position every move
-        calculateBestMove(); // Calculate the best move using Pythagorean theorem
+        //Prevents the ghost from staying in the box
+        if (firstMoves > 0) {
+            this.direction = Direction.UP;
+            setNextPos();
+            firstMoves--;
+        } else {
 
-        setNextPos(); // Set the next position based on the best move
+            updateTarget(); // Update target position every move
+            calculateBestMove(); // Calculate the best move using Pythagorean theorem
+
+            setNextPos(); // Set the next position based on the best move
+        }
     }
 
-    // Update Blinky target position to Pacman's current position
+    // Updates the target of Pinky.
     private void updateTarget() {
-        this.targetX = pacMan.getPosX()+10;
-        this.targetY = pacMan.getPosY()+10;
+        this.targetX = pacMan.posX;
+        this.targetY = pacMan.posY;
+        Direction direction1 = pacMan.direction;
+        switch (direction1) {
+            case UP -> this.targetY -= 4;
+            case DOWN -> this.targetY += 4;
+            case LEFT -> this.targetX -= 4;
+            case RIGHT -> this.targetX += 4;
+
+        }
     }
 
     // Calculate the best move using Pythagorean theorem
@@ -58,6 +79,11 @@ public class Pinky extends MovingObjects {
             // Calculate distance using Pythagorean theorem
             double distance = Math.sqrt(Math.pow(nextX - targetX, 2) + Math.pow(nextY - targetY, 2));
 
+            // Checks if the next field is not the box, if true skip this direction
+            if ((nextX == 14 && nextY == 12) || (nextX == 15 && nextY == 12)) {
+                continue;
+            }
+
             // Check if movement is possible and if the calculated distance is shorter
             if (canMove(nextX, nextY) && distance < shortestDistance) {
                 shortestDistance = distance;
@@ -74,6 +100,13 @@ public class Pinky extends MovingObjects {
                 (newDirection == Direction.DOWN && currentDirection == Direction.UP) ||
                 (newDirection == Direction.LEFT && currentDirection == Direction.RIGHT) ||
                 (newDirection == Direction.RIGHT && currentDirection == Direction.LEFT);
+    }
+
+    //Sets the ghost position to his starting position
+    public void death() {
+        this.posX = startPosX;
+        this.posY = startPosY;
+        firstMoves = 3;
     }
 
 }

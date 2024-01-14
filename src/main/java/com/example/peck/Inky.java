@@ -2,33 +2,64 @@ package com.example.peck;
 
 import javafx.scene.image.ImageView;
 
-public class Inky extends  MovingObjects {
+public class Inky extends MovingObjects {
 
     private int targetX;
     private int targetY;
 
     private Pacman pacMan;
-    public Inky(Pacman pm) {
+
+    private Blinky blinky;
+
+    private int[] scatterPoint = {31, 31};
+
+    private int firstMoves = 2;
+
+    public Inky(Pacman pm, Blinky blinky) {
         super("ghosts/inky.gif");
         this.correspondingChar = '4';
         this.pacMan = pm;
+        this.blinky = blinky;
     }
 
+    //Inky´s target is the diagonal times two from Blinky to PacMan´s position plus 2
     @Override
     public void move(char[] levelData, ImageView[][] tileView) {
         this.levelData = levelData;
         this.tileView = tileView;
 
-        updateTarget(); // Update target position every move
-        calculateBestMove(); // Calculate the best move using Pythagorean theorem
+        //Prevents the ghost from staying in the box
+        if (firstMoves > 0) {
+            this.direction = Direction.UP;
+            setNextPos();
+            firstMoves--;
+        } else {
 
-        setNextPos(); // Set the next position based on the best move
+            updateTarget(); // Update target position every move
+            calculateBestMove(); // Calculate the best move using Pythagorean theorem
+
+            setNextPos(); // Set the next position based on the best move
+        }
     }
 
-    // Update Blinky target position to Pacman's current position
+    // Update Inky´s target position
     private void updateTarget() {
-        this.targetX = pacMan.getPosX()-10;
-        this.targetY = pacMan.getPosY()-10;
+        this.targetX = pacMan.posX;
+        this.targetY = pacMan.posY;
+        Direction direction1 = pacMan.direction;
+        switch (direction1) {
+            case UP -> this.targetY -= 2;
+            case DOWN -> this.targetY += 2;
+            case LEFT -> this.targetX -= 2;
+            case RIGHT -> this.targetX += 2;
+
+        }
+        int difX = Math.abs(Math.abs(blinky.posX - targetX));
+        int difY = Math.abs(Math.abs(blinky.posY - targetY));
+
+        this.targetX += difX;
+        this.targetY += difY;
+
     }
 
     // Calculate the best move using Pythagorean theorem
@@ -57,6 +88,11 @@ public class Inky extends  MovingObjects {
             // Calculate distance using Pythagorean theorem
             double distance = Math.sqrt(Math.pow(nextX - targetX, 2) + Math.pow(nextY - targetY, 2));
 
+            // Checks if the next field is not the box, if true skip this direction
+            if ((nextX == 14 && nextY == 12) || (nextX == 15 && nextY == 12)) {
+                continue;
+            }
+
             // Check if movement is possible and if the calculated distance is shorter
             if (canMove(nextX, nextY) && distance < shortestDistance) {
                 shortestDistance = distance;
@@ -73,5 +109,12 @@ public class Inky extends  MovingObjects {
                 (newDirection == Direction.DOWN && currentDirection == Direction.UP) ||
                 (newDirection == Direction.LEFT && currentDirection == Direction.RIGHT) ||
                 (newDirection == Direction.RIGHT && currentDirection == Direction.LEFT);
+    }
+
+    //Sets the ghost position to his starting position
+    public void death() {
+        this.posX = startPosX;
+        this.posY = startPosY;
+        firstMoves = 2;
     }
 }
