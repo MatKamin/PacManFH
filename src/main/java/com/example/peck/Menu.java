@@ -3,17 +3,13 @@ package com.example.peck;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Application;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Group;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
@@ -74,7 +70,7 @@ public class Menu extends Application {
                         splashStage.close();
 
                         // Now set up the main menu stage
-                        primaryStage.setScene(createMenu(primaryStage, null));
+                        primaryStage.setScene(createMenu(primaryStage));
                         primaryStage.setTitle("Pac-Man 2.0");
                         primaryStage.setResizable(false);
                         primaryStage.initStyle(StageStyle.DECORATED); // Make sure the main menu has decorations
@@ -85,7 +81,7 @@ public class Menu extends Application {
             // Play the timeline
             timeline.play();
         } else {
-            primaryStage.setScene(createMenu(primaryStage, null));
+            primaryStage.setScene(createMenu(primaryStage));
             primaryStage.setTitle("Pac-Man 2.0");
             primaryStage.setResizable(false);
             primaryStage.initStyle(StageStyle.DECORATED); // Make sure the main menu has decorations
@@ -99,7 +95,7 @@ public class Menu extends Application {
      * @param stage needed for interactive Scene switch
      * @return returns a new Scene object, which can be shown in a Stage
      */
-    private Scene createMenu(Stage stage, Scene previousScene) {
+    private Scene createMenu(Stage stage) {
         // Main Container of the Menu
         BorderPane menuBorderPane = new BorderPane();
         menuBorderPane.getStyleClass().add("borderPane");
@@ -150,6 +146,11 @@ public class Menu extends Application {
         loginButton.setOnAction(event -> {
             Scene loginScene = openLoginWindow(stage, menuScene);
             stage.setScene(loginScene);
+        });
+
+        highScoresButton.setOnAction(event -> {
+            Scene highscoreScene = openHighscoreWindow(stage, menuScene);
+            stage.setScene(highscoreScene);
         });
 
         return menuScene;
@@ -305,10 +306,18 @@ public class Menu extends Application {
             pacmanGame.startGame();
         });
 
+        settingsButton.setOnAction(event -> {
+            Scene settingsScene = openSettingsWindow(stage, menuScene);
+            stage.setScene(settingsScene);
+        });
+
+        statsButton.setOnAction(event -> {
+            Scene statsScene = openStatsWindow(stage, menuScene);
+            stage.setScene(statsScene);
+        });
+
         return menuScene;
     }
-
-
     private void showAlert(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle(title);
@@ -389,6 +398,105 @@ public class Menu extends Application {
 
         return loginScene;
     }
+    private Scene openHighscoreWindow(Stage stage, Scene previousScene) {
+        // Main Container of the Menu
+        BorderPane highscoreBorderPane = new BorderPane();
+        highscoreBorderPane.getStyleClass().add("borderPane");
+
+        // Title with custom font
+        Text title = new Text("hIgHsCoRe");
+        title.setFont(pacmanFont);
+        title.getStyleClass().add("title");
+        highscoreBorderPane.setTop(title);
+        BorderPane.setAlignment(title, Pos.TOP_CENTER);
+
+        StackPane titleContainer = new StackPane();
+        titleContainer.getChildren().add(title);
+        titleContainer.getStyleClass().add("titleContainer");
+        highscoreBorderPane.setTop(titleContainer);
+        BorderPane.setAlignment(titleContainer, Pos.TOP_CENTER);
+
+        VBox leaderboard = new VBox(8); // Set spacing between entries
+
+        // 8 test entries
+        for (int i = 1; i < 9; i++) {
+            // Create an HBox for a leaderboard entry
+            HBox entry = new HBox(20); // Set spacing between name and score
+            Label nameLabel = new Label("Player " + i);
+            Label scoreLabel = new Label(Integer.toString(1000 - i * 100));
+            nameLabel.getStyleClass().add("customTextInput"); // create custom label style
+            scoreLabel.getStyleClass().add("customTextInput"); //create custom label style
+            entry.getChildren().addAll(nameLabel, scoreLabel);
+
+            // Add to leaderboard
+            leaderboard.getChildren().add(entry);
+        }
+
+        highscoreBorderPane.setCenter(leaderboard);
+        Scene highscoreScene = new Scene(highscoreBorderPane, 750, 821);
+        highscoreScene.getStylesheets().add("styles.css");
+
+        highscoreScene.setOnKeyPressed(event -> {
+            if (event.getCode() == KeyCode.ESCAPE) {
+                stage.setScene(previousScene);
+            }
+        });
+
+        return highscoreScene;
+    }
+    private Scene openSettingsWindow(Stage stage, Scene previousScene) {
+        // Main Container of the Menu
+        BorderPane settingsBorderPane = new BorderPane();
+        settingsBorderPane.getStyleClass().add("borderPane");
+
+        // Title with custom font
+        Text title = new Text("SeTTinGs");
+        title.setFont(pacmanFont);
+        title.getStyleClass().add("title");
+        settingsBorderPane.setTop(title);
+        BorderPane.setAlignment(title, Pos.TOP_CENTER);
+
+        StackPane titleContainer = new StackPane();
+        titleContainer.getChildren().add(title);
+        titleContainer.getStyleClass().add("titleContainer");
+        settingsBorderPane.setTop(titleContainer);
+        BorderPane.setAlignment(titleContainer, Pos.TOP_CENTER);
+
+        settingsBorderPane.setOnKeyPressed(event -> {
+            if (event.getCode() == KeyCode.ESCAPE) {
+                stage.setScene(previousScene);
+            }
+        });
+
+        return previousScene; // return new scene
+    }
+    private Scene openStatsWindow(Stage stage, Scene previousScene) {
+        // Main Container of the Menu
+        BorderPane statsBorderPane = new BorderPane();
+        statsBorderPane.getStyleClass().add("borderPane");
+
+        // Title with custom font
+        Text title = new Text("SeTTinGs");
+        title.setFont(pacmanFont);
+        title.getStyleClass().add("title");
+        statsBorderPane.setTop(title);
+        BorderPane.setAlignment(title, Pos.TOP_CENTER);
+
+        StackPane titleContainer = new StackPane();
+        titleContainer.getChildren().add(title);
+        titleContainer.getStyleClass().add("titleContainer");
+        statsBorderPane.setTop(titleContainer);
+        BorderPane.setAlignment(titleContainer, Pos.TOP_CENTER);
+
+        statsBorderPane.setOnKeyPressed(event -> {
+            if (event.getCode() == KeyCode.ESCAPE) {
+                stage.setScene(previousScene);
+            }
+        });
+
+        return previousScene;// return new scene
+    }
+
 
     public static void main(String[] args) {
         launch();

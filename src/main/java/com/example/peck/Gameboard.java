@@ -185,7 +185,10 @@ public class Gameboard {
         this.pacman.move(this.levelData, this.tileViews);
         tileViews = this.pacman.tileView;
         levelData = this.pacman.levelData;
-
+        for (MovingObjects gh:ghostObjects)
+        {
+            checkIfEntityCollision(gh);
+        }
         moveGhosts();
 
         // Check if Pac-Man won
