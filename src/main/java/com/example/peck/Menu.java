@@ -19,6 +19,7 @@ import javafx.stage.StageStyle;
 import javafx.util.Duration;
 import javafx.scene.input.KeyCode;
 
+import java.io.InputStream;
 import java.util.Objects;
 
 
@@ -301,9 +302,14 @@ public class Menu extends Application {
 
 
         playButton.setOnAction(event -> {
-            PacmanGame pacmanGame = new PacmanGame(levelFile, skinFolder, stage);
-            stage.setScene(pacmanGame.getGameView());
-            pacmanGame.startGame();
+            try {
+                PacmanGame pacmanGame = new PacmanGame(levelFile, skinFolder, stage);
+                stage.setScene(pacmanGame.getGameView());
+                pacmanGame.startGame();
+            } catch (Exception e) {
+                e.printStackTrace();
+                showAlert("Error", "Failed to start the game: " + e.getMessage());
+            }
         });
 
         settingsButton.setOnAction(event -> {

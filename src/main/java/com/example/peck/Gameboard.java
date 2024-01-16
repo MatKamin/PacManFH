@@ -16,6 +16,7 @@ import javafx.stage.Stage;
 import javafx.scene.media.*;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.*;
@@ -58,7 +59,7 @@ public class Gameboard {
     private int counter=0;
 
     //Gameboard Constructor
-    public Gameboard(String level, String skin) {
+    public Gameboard(String level, String skin) throws IOException {
         this.pacman = new Pacman(skin);
         this.blinky = new Blinky(pacman);
         this.inky = new Inky(pacman, blinky);
@@ -127,13 +128,24 @@ public class Gameboard {
      * Reads the level layout from a file and converts it to a character array.
      * @return A char array representing the level layout.
      */
-    private char[] readLevel(String level) {
+    private char[] readLevel(String level) throws IOException {
+        if (level.isEmpty()) {
+            throw new IllegalArgumentException("Level file path is empty.");
+        }
         StringBuilder stringBuilder = new StringBuilder();
         InputStream inputStream = getClass().getResourceAsStream(level);
-        if (inputStream != null) {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-            reader.lines().forEach(stringBuilder::append);
+
+        if (inputStream == null) {
+            throw new IllegalArgumentException("Invalid level file: " + level + " does not exist");
         }
+
+        if (inputStream.available() == 0) {
+            throw new IllegalArgumentException("Empty level file: " + level);
+        }
+
+        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+        reader.lines().forEach(stringBuilder::append);
+
         return stringBuilder.toString().toCharArray();
     }
 
@@ -155,6 +167,7 @@ public class Gameboard {
         imageMap.put('L', railUpLeft_img);
         imageMap.put('U', railRightUp_img);
         imageMap.put('D', railLeftUp_img);
+
 
 
         for (int row = 0; row < GRID_HEIGHT; row++) {

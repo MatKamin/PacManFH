@@ -12,6 +12,8 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
+import java.io.IOException;
+
 public class PacmanGame {
 
     //Scene Elements
@@ -31,7 +33,7 @@ public class PacmanGame {
 
 
     //Constructor for a new game
-    public PacmanGame(String level, String skin, Stage stage) {
+    public PacmanGame(String level, String skin, Stage stage) throws IOException {
         this.gameboard = new Gameboard(level, skin);
         this.gameView = initializeScene();
         this.stage = stage;
