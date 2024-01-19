@@ -86,4 +86,6 @@ public abstract class MovingObjects {
         return this.posY;
     }
 
+    public void death() {
+    }
 }

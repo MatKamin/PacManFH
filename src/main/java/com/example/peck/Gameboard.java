@@ -9,15 +9,14 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.*;
 
 public class Gameboard {
@@ -51,10 +50,11 @@ public class Gameboard {
     private Pinky pinky;
     private Clyde clyde;
     private ImageView[] ghosts = new ImageView[4];
+    private ImageView[] scaredGhosts = new ImageView[4];
     private MovingObjects[] ghostObjects = new MovingObjects[4];//{inky, blinky, pinky, clyde};
     //Ghosts
     private int ghostnumber=1;
-
+    private boolean scared = false;
     private int counter=0;
 
     //Gameboard Constructor
@@ -82,6 +82,11 @@ public class Gameboard {
         ghostObjects[1] = inky;
         ghostObjects[2] = clyde;
         ghostObjects[3] = pinky;
+        scaredGhosts[0] = loadAndScaleImage("ghosts/scared.gif");
+        scaredGhosts[1] = loadAndScaleImage("ghosts/scared.gif");
+        scaredGhosts[2] = loadAndScaleImage("ghosts/scared.gif");
+        scaredGhosts[3] = loadAndScaleImage("ghosts/scared.gif");
+
     }
     //GameBoard Methods (includes gameboard creation, game updates and ghost movement)
     /**
@@ -191,32 +196,29 @@ public class Gameboard {
     }
 
     /**
-     * Updates the moving Objects whenever called
+     * Updates the moving objects whenever called
      */
     public void update(Stage stage) {
+        // Moves pacman and the ghosts
         this.pacman.move(this.levelData, this.tileViews);
         tileViews = this.pacman.tileView;
         levelData = this.pacman.levelData;
-        for (MovingObjects gh:ghostObjects)
-        {
-            checkIfEntityCollision(gh);
-        }
+        pacmanCollision(stage);
         moveGhosts(stage);
 
         // Check if Pac-Man won
-        if (won()) {
-            stage.setScene(winScreen(stage));
-        }
+        if (won()) stage.setScene(winScreen(stage));
 
-        if (this.pacman.dotsEaten == 75 || this.pacman.dotsEaten == 175) {
-            placeFood();
-        }
+        // Place food when a certain amount of dots has been eaten
+        if (this.pacman.dotsEaten == 75 || this.pacman.dotsEaten == 175) placeFood();
 
+        // Draws the objects onto the screen and raises the counter, which acts as a reference to passed time
         draw();
         counter++;
-        if(counter%(40*ghostnumber)==0 && ghostnumber<ghostObjects.length){
-            ghostnumber++;
-        }
+
+        // Determines the number of active ghosts
+        if(counter%(40*ghostnumber)==0 && ghostnumber<ghostObjects.length) ghostnumber++;
+
         //Timer for Scatter mode
         if(pacman.scatterTimer>=0){
             if(pacman.scatterTimer==0){
@@ -230,18 +232,18 @@ public class Gameboard {
 
     /**
      * This Method checks if Pac-Man has already won!
-     * @return true: if all dots are eaten
-     * @return false: if there are still dots left
+     * @return
+     * true: if all dots are eaten
+     * false: if there are still dots left
      */
     private boolean won() {
-        for (int i = 0; i < tileViews.length; i++) {
-            for (int j = 0; j < tileViews[i].length; j++) {
-                String fullUrl = tileViews[i][j].getImage().getUrl();
+        for (ImageView[] tileView : tileViews) {
+            for (ImageView imageView : tileView) {
+                String fullUrl = imageView.getImage().getUrl();
                 String url = fullUrl.substring(fullUrl.lastIndexOf("/") + 1);
                 if (url.equals("bigDot.png") || url.equals("smallDot.png")) return false;
             }
         }
-
         return true;
     }
 
@@ -276,13 +278,9 @@ public class Gameboard {
 
         winScene.getStylesheets().add("styles.css");
 
-        menuButton.setOnAction(event -> {
-            stage.setScene(Menu.menuScene);
-        });
+        menuButton.setOnAction(event -> stage.setScene(Menu.menuScene));
 
-        exitButton.setOnAction(e -> {
-            Platform.exit();
-        });
+        exitButton.setOnAction(e -> Platform.exit());
 
         return winScene;
     }
@@ -312,20 +310,42 @@ public class Gameboard {
             default -> current_img;
         };
 
+        // moves pacman
         gameBoard.getChildren().remove(current_img);
         GridPane.setRowIndex(newPacman, this.pacman.getPosY());
         GridPane.setColumnIndex(newPacman, this.pacman.getPosX());
         current_img = newPacman;
         gameBoard.getChildren().add(current_img);
+
+        // moves ghosts
         int cnt = 0;
-        for (ImageView ghostImgView : ghosts){
-            gameBoard.getChildren().remove(ghostImgView);
+        if(scared) {
+            removeGhostView(scaredGhosts);
+        } else removeGhostView(ghosts);
+
+        for (ImageView ghostImgView : getGhostView()){
             GridPane.setRowIndex(ghostImgView, ghostObjects[cnt].posY);
             GridPane.setColumnIndex(ghostImgView, ghostObjects[cnt].posX);
             gameBoard.getChildren().add(ghostImgView);
             cnt++;
         }
 
+    }
+    //determines which ghostview is used
+    private ImageView[] getGhostView() {
+        if (this.pacman.scatterMode) {
+            scared = true;
+            return scaredGhosts;
+        }
+        scared = false;
+        return ghosts;
+    }
+
+    //removes old view
+    private void removeGhostView(ImageView[] ghostView) {
+        for (ImageView ghostImgView : ghostView) {
+            gameBoard.getChildren().remove(ghostImgView);
+        }
     }
     /**
      * Sets the beginning position of the Ghosts based on the level layout
@@ -366,6 +386,9 @@ public class Gameboard {
                         case 3: this.pinky.death();
                             break;
                     }
+                    Media death = new Media(new File("src/main/resources/sounds/ieatghost.mp3").toURI().toString());
+                    MediaPlayer deathGhost = new MediaPlayer(death);
+                    deathGhost.play();
                     this.pacman.edible= Pacman.Edible.GHOST;
                     this.pacman.updateScore();
                 }
@@ -377,6 +400,32 @@ public class Gameboard {
      */
     private boolean checkIfEntityCollision(MovingObjects ghosty) {
         return ghosty.getPosX() == pacman.getPosX() && ghosty.getPosY() == pacman.getPosY();
+    }
+
+    private void pacmanCollision(Stage stage) {
+        for (MovingObjects gh:ghostObjects)
+            if (pacman.getPosX() == gh.getPosX() && pacman.getPosY() == gh.getPosY()) {
+                if(!this.pacman.scatterMode) {
+                    this.pacman.death(stage);
+                    this.blinky.death();
+                    this.clyde.death();
+                    this.pinky.death();
+                    this.inky.death();
+                    this.ghostnumber = 1;
+                    this.counter = 0;
+                } else {
+                    for (MovingObjects ghost : ghostObjects) {
+                        if(ghost.getPosY() == this.pacman.getPosY() && ghost.getPosX() == this.pacman.getPosX()) {
+                            ghost.death();
+                            Media death = new Media(new File("src/main/resources/sounds/ieatghost.mp3").toURI().toString());
+                            MediaPlayer deathGhost = new MediaPlayer(death);
+                            deathGhost.play();
+                            this.pacman.edible = Pacman.Edible.GHOST;
+                            this.pacman.updateScore();
+                        }
+                    }
+                }
+            }
     }
 
     //Get the GridPane for Scene creation

@@ -34,6 +34,7 @@ public class Pacman extends MovingObjects {
     public int scatterTimer=0;
 
     public Font deathFont = Font.loadFont(getClass().getResourceAsStream("/fonts/emulogic.ttf"), 64);
+    private MediaPlayer foodPlayer, sirenPlayer, deathPlayer;
 
 
     //Constructor
@@ -44,6 +45,20 @@ public class Pacman extends MovingObjects {
         this.score = 0;
         this.lives = 3;
         this.edible = Edible.SMALL;
+        initializeMedia();
+    }
+
+    //Intilialize Media
+    private void initializeMedia() {
+        // Sound
+        Media food = new Media(new File("src/main/resources/sounds/fruit.mp3").toURI().toString());
+        foodPlayer = new MediaPlayer(food);
+
+        Media sound = new Media(new File("src/main/resources/sounds/siren.mp3").toURI().toString());
+        sirenPlayer = new MediaPlayer(sound);
+
+        Media death = new Media(new File("src/main/resources/sounds/death.mp3").toURI().toString());
+        deathPlayer = new MediaPlayer(death);
     }
 
     //Movement
@@ -108,8 +123,7 @@ public class Pacman extends MovingObjects {
      */
 
     public void death(Stage stage) {
-        Media death = new Media(new File("src/main/resources/sounds/death.mp3").toURI().toString());
-        MediaPlayer deathPlayer = new MediaPlayer(death);
+        deathPlayer.seek(deathPlayer.getStartTime());
         deathPlayer.play();
 
         if (lives > 1) {
@@ -168,17 +182,18 @@ public class Pacman extends MovingObjects {
     private void eat(int x, int y) {
         dotsEaten++;
 
-        // Sound
-        Media chomp = new Media(new File("src/main/resources/sounds/chomp.mp3").toURI().toString());
-        MediaPlayer chompPlayer = new MediaPlayer(chomp);
-
-        Media food = new Media(new File("src/main/resources/sounds/fruit.mp3").toURI().toString());
-        MediaPlayer foodPlayer = new MediaPlayer(food);
-
         char aktElement = levelData[(y * Gameboard.GRID_WIDTH) + x];
 
-        if (aktElement == 'F') foodPlayer.play();
-        else chompPlayer.play();
+        if (aktElement == 'F') {
+            foodPlayer.seek(foodPlayer.getStartTime());
+            foodPlayer.play();
+        }
+        else {
+            Media chomp = new Media(new File("src/main/resources/sounds/chomp.mp3").toURI().toString());
+            MediaPlayer chompPlayer = new MediaPlayer(chomp);
+            chompPlayer.seek(chompPlayer.getStartTime());
+            chompPlayer.play();
+        }
 
         updateScore();
         levelData[(y * Gameboard.GRID_WIDTH) + x] = 'E'; // Replace the SMALLDOT with empty space
@@ -188,6 +203,8 @@ public class Pacman extends MovingObjects {
         if(edible== Edible.BIG){
             scatterMode=true;
             scatterTimer=30;
+            sirenPlayer.seek(sirenPlayer.getStartTime());
+            sirenPlayer.play();
         }
     }
 
