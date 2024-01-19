@@ -1,10 +1,19 @@
 package com.example.peck;
 
 import javafx.application.Platform;
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
+import javafx.stage.Stage;
 
 import java.io.File;
 
@@ -23,6 +32,8 @@ public class Pacman extends MovingObjects {
     public boolean scatterMode= false;
 
     public int scatterTimer=0;
+
+    public Font deathFont = Font.loadFont(getClass().getResourceAsStream("/fonts/emulogic.ttf"), 64);
 
 
     //Constructor
@@ -96,13 +107,55 @@ public class Pacman extends MovingObjects {
      * Are no lives left then game over
      */
 
-    public void death() {
+    public void death(Stage stage) {
+        Media death = new Media(new File("src/main/resources/sounds/death.mp3").toURI().toString());
+        MediaPlayer deathPlayer = new MediaPlayer(death);
+        deathPlayer.play();
+
         if (lives > 1) {
             this.lives -= 1;
             this.posX = startPosX;
             this.posY = startPosY;
         }
-        else Platform.exit();
+        else stage.setScene(deathScreen(stage));
+    }
+
+    private Scene deathScreen(Stage stage) {
+        PacmanGame.timeline.stop();
+        BorderPane borderPane = new BorderPane();
+        borderPane.getStyleClass().add("win");
+
+        Text text = new Text("You Lose!");
+        text.setFont(deathFont);
+        text.setFill(Color.YELLOW);
+
+        Button menuButton = new Button("Retry");
+        menuButton.setFont(deathFont);
+        menuButton.getStyleClass().add("customButton");
+
+        Button exitButton = new Button(" Exit ");
+        exitButton.setFont(deathFont);
+        exitButton.getStyleClass().add("customButton");
+
+        VBox buttonBox = new VBox(100);
+        buttonBox.getChildren().addAll(text, menuButton, exitButton);
+        buttonBox.setAlignment(Pos.CENTER);
+        borderPane.setCenter(buttonBox);
+
+        Scene deathScene = new Scene(borderPane, Gameboard.GRID_WIDTH * Gameboard.TILE_SIZE,
+                (Gameboard.GRID_HEIGHT * Gameboard.TILE_SIZE) + 40);
+
+        deathScene.getStylesheets().add("styles.css");
+
+        menuButton.setOnAction(event -> {
+            stage.setScene(Menu.menuScene);
+        });
+
+        exitButton.setOnAction(e -> {
+            Platform.exit();
+        });
+
+        return deathScene;
     }
 
 
@@ -118,8 +171,14 @@ public class Pacman extends MovingObjects {
         // Sound
         Media chomp = new Media(new File("src/main/resources/sounds/chomp.mp3").toURI().toString());
         MediaPlayer chompPlayer = new MediaPlayer(chomp);
-        chompPlayer.play();
 
+        Media food = new Media(new File("src/main/resources/sounds/fruit.mp3").toURI().toString());
+        MediaPlayer foodPlayer = new MediaPlayer(food);
+
+        char aktElement = levelData[(y * Gameboard.GRID_WIDTH) + x];
+
+        if (aktElement == 'F') foodPlayer.play();
+        else chompPlayer.play();
 
         updateScore();
         levelData[(y * Gameboard.GRID_WIDTH) + x] = 'E'; // Replace the SMALLDOT with empty space

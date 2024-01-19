@@ -8,13 +8,11 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
-import javafx.scene.media.*;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -203,7 +201,7 @@ public class Gameboard {
         {
             checkIfEntityCollision(gh);
         }
-        moveGhosts();
+        moveGhosts(stage);
 
         // Check if Pac-Man won
         if (won()) {
@@ -341,7 +339,7 @@ public class Gameboard {
     /**
      * Moves ghosts in the grid
      */
-    public void moveGhosts(){
+    public void moveGhosts(Stage stage){
 
         for (int i=0;i<ghostnumber;i++){
             ghostObjects[i].move(this.levelData, this.tileViews);
@@ -349,7 +347,7 @@ public class Gameboard {
             levelData = ghostObjects[i].levelData;
             if(checkIfEntityCollision(ghostObjects[i])){
                 if(!pacman.scatterMode) {
-                    this.pacman.death();
+                    this.pacman.death(stage);
                     this.blinky.death();
                     this.clyde.death();
                     this.pinky.death();
