@@ -1,5 +1,6 @@
 package com.example.peck;
 
+import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -264,8 +265,12 @@ public class Gameboard {
         menuButton.setFont(winFont);
         menuButton.getStyleClass().add("customButton");
 
+        Button exitButton = new Button("Exit");
+        exitButton.setFont(winFont);
+        exitButton.getStyleClass().add("customButton");
+
         VBox buttonBox = new VBox(100);
-        buttonBox.getChildren().addAll(text, menuButton);
+        buttonBox.getChildren().addAll(text, menuButton, exitButton);
         buttonBox.setAlignment(Pos.CENTER);
         borderPane.setCenter(buttonBox);
 
@@ -275,6 +280,10 @@ public class Gameboard {
 
         menuButton.setOnAction(event -> {
             stage.setScene(Menu.menuScene);
+        });
+
+        exitButton.setOnAction(e -> {
+            Platform.exit();
         });
 
         return winScene;
