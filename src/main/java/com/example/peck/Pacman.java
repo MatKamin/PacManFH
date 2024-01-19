@@ -129,11 +129,11 @@ public class Pacman extends MovingObjects {
         text.setFont(deathFont);
         text.setFill(Color.YELLOW);
 
-        Button menuButton = new Button("Retry");
+        Button menuButton = new Button("RETRY");
         menuButton.setFont(deathFont);
         menuButton.getStyleClass().add("customButton");
 
-        Button exitButton = new Button(" Exit ");
+        Button exitButton = new Button(" EXIT ");
         exitButton.setFont(deathFont);
         exitButton.getStyleClass().add("customButton");
 

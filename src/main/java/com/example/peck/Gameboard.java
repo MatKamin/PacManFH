@@ -259,11 +259,11 @@ public class Gameboard {
         text.setFont(winFont);
         text.setFill(Color.YELLOW);
 
-        Button menuButton = new Button("Go back");
+        Button menuButton = new Button("GO BACK");
         menuButton.setFont(winFont);
         menuButton.getStyleClass().add("customButton");
 
-        Button exitButton = new Button("Exit");
+        Button exitButton = new Button("EXIT");
         exitButton.setFont(winFont);
         exitButton.getStyleClass().add("customButton");
 
