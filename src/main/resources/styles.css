@@ -18,7 +18,7 @@
 
 .title {
     -fx-font-family: 'PacFont';
-    -fx-font-size: 96px;
+    -fx-font-size: 70px;
     -fx-fill: #FFFF00;
     -fx-effect: dropshadow( one-pass-box , black , 8 , 0.0 , 2 , 0 );
 }
@@ -62,4 +62,19 @@
 
 .win {
     -fx-background-color: #1919A6;
+}
+
+
+
+/*
+    Highscores
+ */
+
+.vbox {
+    -fx-alignment: center-left;
+}
+
+.score-label {
+    -fx-border-color: transparent transparent transparent #2121DE;
+    -fx-border-width: 0 0 0 5px;
 }

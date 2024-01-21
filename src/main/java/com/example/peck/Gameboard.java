@@ -1,49 +1,50 @@
 package com.example.peck;
 
+import com.example.peck.ghosts.Blinky;
+import com.example.peck.ghosts.Clyde;
+import com.example.peck.ghosts.Inky;
+import com.example.peck.ghosts.Pinky;
+import com.example.peck.config.CurrentUser;
+import com.example.peck.database.DatabaseHelper;
+import com.example.peck.ui.DeathScreenWindow;
+import com.example.peck.ui.PacmanGameWindow;
+import com.example.peck.ui.WinScreenWindow;
 import javafx.application.Platform;
-import javafx.geometry.Pos;
-import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.VBox;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
-import javafx.scene.text.Text;
 import javafx.stage.Stage;
-
 import java.io.*;
 import java.util.*;
 
+import static com.example.peck.ImageLoader.*;
+import static com.example.peck.LevelLoader.*;
+import static com.example.peck.config.Constants.*;
+
+/**
+ * Represents the game board for Pac-Man.
+ */
 public class Gameboard {
+    private WinScreenWindow winScreenWindow;
 
-    //GridPane Attributes
+    // GridPane Attributes
     private final GridPane gameBoard;
-    public static final int TILE_SIZE = 25;
-    public static final int GRID_WIDTH = 30;
-    public static final int GRID_HEIGHT = 31;
 
-    //GridPane reference and ImageViews
+    // GridPane reference and ImageViews
     private ImageView[][] tileViews = new ImageView[GRID_HEIGHT][GRID_WIDTH];
     private ImageView pacmanUp_img, pacmanDown_img, pacmanLeft_img, pacmanRight_img, current_img,
             bigdot_img, smalldot_img, nowall_img, blinky_img, pinky_img, clyde_img, inky_img,
             railHorizontal_img, railUpRight_img, railUpLeft_img, railRightUp_img, railLeftUp_img, cherries_img, railVertical_img;
 
-    public Font winFont = Font.loadFont(getClass().getResourceAsStream("/fonts/emulogic.ttf"), 64);
-
-    //Level
-    public static final char[] WALLS = {'H', 'R', 'L', 'U', 'D', 'V'};
-
+    // Level
     public char[] getLevelData() {
         return levelData;
     }
+
     private char[] levelData;
 
-    //Moving Objects
+    // Moving Objects
     public Pacman pacman;
     private Inky inky;
     private Blinky blinky;
@@ -51,15 +52,25 @@ public class Gameboard {
     private Clyde clyde;
     private ImageView[] ghosts = new ImageView[4];
     private ImageView[] scaredGhosts = new ImageView[4];
-    private MovingObjects[] ghostObjects = new MovingObjects[4];//{inky, blinky, pinky, clyde};
-    //Ghosts
-    private int ghostnumber=1;
-    private boolean scared = false;
-    private int counter=0;
+    private MovingObjects[] ghostObjects = new MovingObjects[4];
 
-    //Gameboard Constructor
-    public Gameboard(String level, String skin) throws IOException {
-        this.pacman = new Pacman(skin);
+    // Ghosts
+    private int ghostnumber = 1;
+    private boolean scared = false;
+    private int counter = 0;
+
+    /**
+     * Constructs a Gameboard with the given level, skin, winScreenWindow, and deathScreenWindow.
+     *
+     * @param level            The level of the game.
+     * @param skin             The skin for Pac-Man.
+     * @param winScreenWindow  The window to display when Pac-Man wins.
+     * @param deathScreenWindow The window to display when Pac-Man dies.
+     * @throws IOException If an IO error occurs.
+     */
+    public Gameboard(String level, String skin, WinScreenWindow winScreenWindow, DeathScreenWindow deathScreenWindow) throws IOException {
+        this.winScreenWindow = winScreenWindow;
+        this.pacman = new Pacman(skin, deathScreenWindow);
         this.blinky = new Blinky(pacman);
         this.inky = new Inky(pacman, blinky);
         this.clyde = new Clyde(pacman);
@@ -88,19 +99,7 @@ public class Gameboard {
         scaredGhosts[3] = loadAndScaleImage("ghosts/scared.gif");
 
     }
-    //GameBoard Methods (includes gameboard creation, game updates and ghost movement)
-    /**
-     * Scales down the resource image
-     * @param imagePath Path to image file
-     * @return ImageView of the Image
-     */
-    private ImageView loadAndScaleImage(String imagePath) {
-        ImageView imageView = new ImageView(new Image(imagePath));
-        imageView.setFitWidth(TILE_SIZE);
-        imageView.setFitHeight(TILE_SIZE);
-        imageView.setPreserveRatio(true);
-        return imageView;
-    }
+
 
     /**
      * Initializes all image resources used in the game.
@@ -128,30 +127,7 @@ public class Gameboard {
         railVertical_img = loadAndScaleImage("map/railVertical.png");
     }
 
-    /**
-     * Reads the level layout from a file and converts it to a character array.
-     * @return A char array representing the level layout.
-     */
-    private char[] readLevel(String level) throws IOException {
-        if (level.isEmpty()) {
-            throw new IllegalArgumentException("Level file path is empty.");
-        }
-        StringBuilder stringBuilder = new StringBuilder();
-        InputStream inputStream = getClass().getResourceAsStream(level);
 
-        if (inputStream == null) {
-            throw new IllegalArgumentException("Invalid level file: " + level + " does not exist");
-        }
-
-        if (inputStream.available() == 0) {
-            throw new IllegalArgumentException("Empty level file: " + level);
-        }
-
-        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-        reader.lines().forEach(stringBuilder::append);
-
-        return stringBuilder.toString().toCharArray();
-    }
 
     /**
      * Creates the initial game map (grid) based on level data.
@@ -196,7 +172,9 @@ public class Gameboard {
     }
 
     /**
-     * Updates the moving objects whenever called
+     * Updates the game state by moving Pac-Man and the ghosts, handling collisions, and more.
+     *
+     * @param stage The JavaFX stage used to change scenes.
      */
     public void update(Stage stage) {
         // Moves pacman and the ghosts
@@ -207,7 +185,12 @@ public class Gameboard {
         moveGhosts(stage);
 
         // Check if Pac-Man won
-        if (won()) stage.setScene(winScreen(stage));
+        if (won()) {
+            CurrentUser.score = pacman.getScore();
+            DatabaseHelper.updateHighScore(CurrentUser.username, pacman.getScore());
+            PacmanGameWindow.timeline.stop();
+            Platform.runLater(() -> stage.setScene(winScreenWindow.getScene()));
+        }
 
         // Place food when a certain amount of dots has been eaten
         if (this.pacman.dotsEaten == 75 || this.pacman.dotsEaten == 175) placeFood();
@@ -247,43 +230,6 @@ public class Gameboard {
         return true;
     }
 
-    /**
-     * This Method creates the Win-Scene, which is shown when the Player wins
-     * @param stage The stage in which the scene is shown
-     * @return the finished scene which is shown
-     */
-    private Scene winScreen(Stage stage) {
-        PacmanGame.timeline.stop();
-        BorderPane borderPane = new BorderPane();
-        borderPane.getStyleClass().add("win");
-
-        Text text = new Text("You Win!");
-        text.setFont(winFont);
-        text.setFill(Color.YELLOW);
-
-        Button menuButton = new Button("GO BACK");
-        menuButton.setFont(winFont);
-        menuButton.getStyleClass().add("customButton");
-
-        Button exitButton = new Button("EXIT");
-        exitButton.setFont(winFont);
-        exitButton.getStyleClass().add("customButton");
-
-        VBox buttonBox = new VBox(100);
-        buttonBox.getChildren().addAll(text, menuButton, exitButton);
-        buttonBox.setAlignment(Pos.CENTER);
-        borderPane.setCenter(buttonBox);
-
-        Scene winScene = new Scene(borderPane, GRID_WIDTH * TILE_SIZE, (GRID_HEIGHT * TILE_SIZE) + 40);
-
-        winScene.getStylesheets().add("styles.css");
-
-        menuButton.setOnAction(event -> stage.setScene(Menu.menuScene));
-
-        exitButton.setOnAction(e -> Platform.exit());
-
-        return winScene;
-    }
 
     /**
      * This Method trys to place a cherry on the field [17][14]
