@@ -52,6 +52,7 @@ public class DatabaseHelper {
      * @return true if registration is successful, false otherwise.
      */
     public static boolean registerUser(String username, String password) {
+        username = username.toUpperCase();
         // Generate a random salt
         SecureRandom random = new SecureRandom();
         byte[] salt = new byte[16];
@@ -91,6 +92,7 @@ public class DatabaseHelper {
      * @return true if the credentials are valid, false otherwise.
      */
     public static boolean checkLogin(String username, String password) {
+        username = username.toUpperCase();
         // SQL statement to get the hashed password and salt for the user
         String sql = "SELECT password FROM users WHERE username = ?";
 
