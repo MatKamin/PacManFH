@@ -11,6 +11,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLDecoder;
@@ -24,11 +25,11 @@ import static com.example.peck.config.Variables.*;
 /**
  * Represents the settings window of the application.
  */
-public class SettingsWindow extends Window{
+public class SettingsWindow extends Window {
     /**
      * Constructs a SettingsWindow.
      *
-     * @param stage The primary stage of the application.
+     * @param stage         The primary stage of the application.
      * @param previousScene The scene to be displayed before the settings screen.
      */
     public SettingsWindow(Stage stage, Scene previousScene) {
@@ -147,8 +148,31 @@ public class SettingsWindow extends Window{
 
         skinSelector.setPrefWidth(200); // Set preferred width to make it larger
         skinSelector.setStyle("-fx-font-family: 'Emulogic'; -fx-font-size: 16px; -fx-background-color: #2121DE; -fx-text-fill: #FFFF00;");
-        skinSelector.valueProperty().addListener((observable, oldValue, newValue) -> {
-            CurrentUser.skinFolder = newValue;
+        skinSelector.setCellFactory(lv -> new ListCell<String>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                setText(item);
+                if (item == null || empty) {
+                    setGraphic(null);
+                } else {
+                    // Set the text color and font for each item
+                    setStyle("-fx-text-fill: #FFFF00; -fx-background-color: #2121DE; -fx-font-family: 'Emulogic'; -fx-font-size: 16px;");
+                }
+            }
+        });
+
+        skinSelector.setButtonCell(new ListCell<String>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (item != null && !empty) {
+                    setText(item);
+                    setStyle("-fx-text-fill: #FFFF00; -fx-font-family: 'Emulogic'; -fx-font-size: 16px;");
+                } else {
+                    setText(null);
+                }
+            }
         });
 
         VBox skinContainer = new VBox(10); // Spacing between label and ComboBox
