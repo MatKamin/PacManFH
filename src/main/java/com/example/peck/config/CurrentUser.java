@@ -6,6 +6,6 @@ package com.example.peck.config;
 public class CurrentUser {
     public static String username;
     public static int score = 0;
-    public static String levelFile = "/levels/level_1.txt";
+    public static String levelFile = "/levels/level_2.txt";
     public static String skinFolder = "standard";
 }

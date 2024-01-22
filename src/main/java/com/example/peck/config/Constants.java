@@ -11,7 +11,7 @@ public class Constants {
     // Grid dimension constants.
     public static final int TILE_SIZE = 25;
     public static final int GRID_WIDTH = 30;
-    public static final int GRID_HEIGHT = 31;
+    public static final int GRID_HEIGHT = 33;
 
     // Characters representing different wall types.
     public static final char[] WALLS = {'H', 'R', 'L', 'U', 'D', 'V'};

@@ -59,7 +59,7 @@ public class Pacman extends MovingObjects {
         Media sound = new Media(new File("src/main/resources/sounds/siren.mp3").toURI().toString());
         sirenPlayer = new MediaPlayer(sound);
         applySoundSettings(sirenPlayer);
-
+ 
         Media death = new Media(new File("src/main/resources/sounds/death.mp3").toURI().toString());
         deathPlayer = new MediaPlayer(death);
         applySoundSettings(deathPlayer);
