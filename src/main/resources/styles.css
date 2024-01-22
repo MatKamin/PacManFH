@@ -23,6 +23,16 @@
     -fx-effect: dropshadow( one-pass-box , black , 8 , 0.0 , 2 , 0 );
 }
 
+.username {
+    -fx-fill: #FD0000;
+    -fx-effect: dropshadow( one-pass-box , black , 8 , 0.0 , 2 , 0 );
+}
+
+.escape {
+    -fx-fill: #626262;
+    -fx-effect: dropshadow( one-pass-box , black , 8 , 0.0 , 2 , 0 );
+}
+
 .titleContainer {
     -fx-padding: 80px 0 0 0;
 }

@@ -1,11 +1,13 @@
 package com.example.peck.ui;
 
+import com.example.peck.config.CurrentUser;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
@@ -47,9 +49,14 @@ public class GameMenuWindow extends Window{
         borderPane.setTop(title);
         BorderPane.setAlignment(title, Pos.TOP_CENTER);
 
-        StackPane titleContainer = new StackPane();
-        titleContainer.getChildren().add(title);
+        Text username = new Text("Hello " + CurrentUser.username + "!");
+        username.setFont(Font.font("Emulogic", 24));
+        username.getStyleClass().add("username");
+
+        VBox titleContainer = new VBox(20);
+        titleContainer.getChildren().addAll(title, username);
         titleContainer.getStyleClass().add("titleContainer");
+        titleContainer.setAlignment(Pos.CENTER);
         borderPane.setTop(titleContainer);
         BorderPane.setAlignment(titleContainer, Pos.TOP_CENTER);
 

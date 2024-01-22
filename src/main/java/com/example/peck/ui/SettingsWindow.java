@@ -49,6 +49,11 @@ public class SettingsWindow extends Window{
         title.setFont(pacmanFont);
         title.getStyleClass().add("title");
 
+        Text escape = new Text("Esc to return");
+        escape.setFont(Font.font("Emulogic", 20));
+        borderPane.setBottom(escape);
+        escape.getStyleClass().add("escape");
+
         StackPane titleContainer = new StackPane(title);
         titleContainer.getStyleClass().add("titleContainer");
         borderPane.setTop(titleContainer);
