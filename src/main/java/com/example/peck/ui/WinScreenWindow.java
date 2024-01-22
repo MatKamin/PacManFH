@@ -58,7 +58,7 @@ public class WinScreenWindow extends Window {
         buttonBox.setAlignment(Pos.CENTER);
         borderPane.setCenter(buttonBox);
 
-        Scene winScene = new Scene(borderPane, GRID_WIDTH * TILE_SIZE, (GRID_HEIGHT * TILE_SIZE) + 40);
+        Scene winScene = new Scene(borderPane, WINDOW_WIDTH, WINDOW_HEIGHT);
         winScene.getStylesheets().add("styles.css");
 
         return winScene;

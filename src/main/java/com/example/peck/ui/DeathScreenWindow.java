@@ -52,8 +52,7 @@ public class DeathScreenWindow extends Window {
         buttonBox.setAlignment(Pos.CENTER);
         borderPane.setCenter(buttonBox);
 
-        Scene deathScene = new Scene(borderPane, GRID_WIDTH * TILE_SIZE,
-                (GRID_HEIGHT * TILE_SIZE) + 40);
+        Scene deathScene = new Scene(borderPane, WINDOW_WIDTH, WINDOW_HEIGHT);
 
         deathScene.getStylesheets().add("styles.css");
 

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <dataSource name="pacman">
-  <database-model serializer="dbm" dbms="SQLITE" family-id="SQLITE" format-version="4.49">
+  <database-model serializer="dbm" dbms="SQLITE" family-id="SQLITE" format-version="4.51">
     <root id="1">
       <ServerVersion>3.43.0</ServerVersion>
     </root>
@@ -446,8 +446,7 @@
     </routine>
     <schema id="177" parent="1" name="main">
       <Current>1</Current>
-      <IntrospectionTimestamp>2024-01-22.13:45:31.319</IntrospectionTimestamp>
-      <LocalIntrospectionTimestamp>2024-01-22.12:45:31</LocalIntrospectionTimestamp>
+      <LastIntrospectionLocalTimestamp>2024-01-22.12:45:31</LastIntrospectionLocalTimestamp>
     </schema>
     <argument id="178" parent="16">
       <ArgumentDirection>R</ArgumentDirection>

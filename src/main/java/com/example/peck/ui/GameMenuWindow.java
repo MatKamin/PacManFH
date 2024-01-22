@@ -11,9 +11,11 @@ import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
+import static com.example.peck.config.Constants.*;
 import static com.example.peck.config.CurrentUser.*;
 import static com.example.peck.config.Fonts.*;
 import static com.example.peck.util.AlertUtil.*;
+
 
 /**
  * Represents the main game menu window.
@@ -69,7 +71,7 @@ public class GameMenuWindow extends Window{
         borderPane.setCenter(buttonBox);
 
         // Scene
-        Scene scene = new Scene(borderPane, 750, 821);
+        Scene scene = new Scene(borderPane, WINDOW_WIDTH, WINDOW_HEIGHT);
         scene.getStylesheets().add("styles.css");
 
         return scene;

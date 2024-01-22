@@ -13,7 +13,8 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import java.util.List;
 
-import static com.example.peck.config.Fonts.emulogicFont;
+import static com.example.peck.config.Constants.*;
+import static com.example.peck.config.Fonts.*;
 
 /**
  * Represents the high score window in the game.
@@ -59,7 +60,7 @@ public class HighscoreWindow extends Window {
         BorderPane.setMargin(buttonContainer, new Insets(10, 0, 20, 0));
         borderPane.setBottom(buttonContainer);
 
-        Scene scene = new Scene(borderPane, 750, 821);
+        Scene scene = new Scene(borderPane, WINDOW_WIDTH, WINDOW_HEIGHT);
         scene.getStylesheets().add("styles.css");
 
         setupEscapeKey(scene);

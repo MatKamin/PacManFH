@@ -19,6 +19,7 @@ import java.util.*;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
+import static com.example.peck.config.Constants.*;
 import static com.example.peck.config.Fonts.*;
 import static com.example.peck.config.Variables.*;
 
@@ -62,7 +63,7 @@ public class SettingsWindow extends Window {
         VBox settingsContainer = createSettingsContainer();
         borderPane.setCenter(settingsContainer);
 
-        Scene scene = new Scene(borderPane, 750, 821);
+        Scene scene = new Scene(borderPane, WINDOW_WIDTH, WINDOW_HEIGHT);
         scene.getStylesheets().add("styles.css");
 
         setupEscapeKey(scene);

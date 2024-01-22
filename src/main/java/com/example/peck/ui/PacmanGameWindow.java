@@ -78,7 +78,7 @@ public class PacmanGameWindow {
         gameVBox.getChildren().addAll(labelContainer, this.gameboard.getGameBoard());
 
         //Create Scene and set style
-        Scene scene = new Scene(gameVBox, GRID_WIDTH*TILE_SIZE, (GRID_HEIGHT*TILE_SIZE) +LABEL_AREA_HEIGHT);
+        Scene scene = new Scene(gameVBox, WINDOW_WIDTH, (WINDOW_HEIGHT) + LABEL_AREA_HEIGHT);
         scene.getStylesheets().add("styles.css"); // Apply external CSS
         scene.setOnKeyPressed(event -> this.gameboard.pacman.handleInput(event.getCode()));
 

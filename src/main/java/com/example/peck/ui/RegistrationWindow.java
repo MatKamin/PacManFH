@@ -14,9 +14,9 @@ import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
+import static com.example.peck.config.Constants.*;
 import static com.example.peck.config.Fonts.*;
 import static com.example.peck.util.AlertUtil.*;
-import static com.example.peck.util.PasswordValidator.*;
 
 /**
  * Represents the registration window of the application.
@@ -70,7 +70,7 @@ public class RegistrationWindow extends Window {
         borderPane.setCenter(inputLayout);
 
 
-        Scene scene = new Scene(borderPane, 750, 821);
+        Scene scene = new Scene(borderPane, WINDOW_WIDTH, WINDOW_HEIGHT);
         scene.getStylesheets().add("styles.css");
 
         setupEscapeKey(scene);
@@ -155,8 +155,6 @@ public class RegistrationWindow extends Window {
             showAlert("Invalid Password", "Password must contain at least one special character (@, #, $, %, ^, &, +, =, .).");
             return;
         }
-
-
 
         boolean isRegistered = DatabaseHelper.registerUser(username, password);
 
