@@ -14,9 +14,9 @@ import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
-import static com.example.peck.config.Fonts.emulogicFont;
-import static com.example.peck.config.Fonts.pacmanFont;
+import static com.example.peck.config.Fonts.*;
 import static com.example.peck.util.AlertUtil.*;
+import static com.example.peck.util.PasswordValidator.*;
 
 /**
  * Represents the registration window of the application.
@@ -121,15 +121,42 @@ public class RegistrationWindow extends Window {
         String password = passwordField.getText();
         String confirmPassword = confirmPasswordField.getText();
 
+        if (username.isEmpty() || password.isEmpty()) {
+            showAlert("Empty Fields", "Please enter both username and password.");
+            return;
+        }
+
         if (!password.equals(confirmPassword)) {
             showAlert("Password Mismatch", "The passwords do not match. Please try again.");
             return;
         }
 
-        if (username.isEmpty() || password.isEmpty()) {
-            showAlert("Empty Fields", "Please enter both username and password.");
+        if (password.length() < 8) {
+            showAlert("Invalid Password", "Password is too short. It must be at least 8 characters.");
             return;
         }
+
+        if (!password.matches(".*[0-9].*")) {
+            showAlert("Invalid Password", "Password is missing a number.");
+            return;
+        }
+
+        if (!password.matches(".*[a-z].*")) {
+            showAlert("Invalid Password", "Password must contain at least one lowercase letter.");
+            return;
+        }
+
+        if (!password.matches(".*[A-Z].*")) {
+            showAlert("Invalid Password", "Password must contain at least one uppercase letter.");
+            return;
+        }
+
+        if (!password.matches(".*[@#$%^&+=.].*")) {
+            showAlert("Invalid Password", "Password must contain at least one special character (@, #, $, %, ^, &, +, =, .).");
+            return;
+        }
+
+
 
         boolean isRegistered = DatabaseHelper.registerUser(username, password);
 

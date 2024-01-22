@@ -12,6 +12,8 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.example.peck.util.PasswordValidator.*;
+
 /**
  * Handles database operations for the application.
  */
@@ -53,6 +55,12 @@ public class DatabaseHelper {
      */
     public static boolean registerUser(String username, String password) {
         username = username.toUpperCase();
+
+        if (!isPasswordValid(password)) {
+            System.out.println("Invalid password format.");
+            return false;
+        }
+
         // Generate a random salt
         SecureRandom random = new SecureRandom();
         byte[] salt = new byte[16];
