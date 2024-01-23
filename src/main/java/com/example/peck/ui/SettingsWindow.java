@@ -147,6 +147,14 @@ public class SettingsWindow extends Window {
         skinSelector.getItems().addAll(getSkinFolderNames());
         skinSelector.getSelectionModel().select(CurrentUser.skinFolder);
 
+
+        skinSelector.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue != null) {
+                CurrentUser.skinFolder = newValue;
+            }
+        });
+
+
         skinSelector.setPrefWidth(200); // Set preferred width to make it larger
         skinSelector.setStyle("-fx-font-family: 'Emulogic'; -fx-font-size: 16px; -fx-background-color: #2121DE; -fx-text-fill: #FFFF00;");
         skinSelector.setCellFactory(lv -> new ListCell<String>() {
