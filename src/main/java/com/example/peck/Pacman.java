@@ -15,6 +15,7 @@ import java.io.File;
 
 import static com.example.peck.config.Constants.*;
 import static com.example.peck.config.Variables.*;
+import static com.example.peck.util.SoundManagement.applySoundSettings;
 
 public class Pacman extends MovingObjects {
 
@@ -63,14 +64,6 @@ public class Pacman extends MovingObjects {
         Media death = new Media(new File("src/main/resources/sounds/death.mp3").toURI().toString());
         deathPlayer = new MediaPlayer(death);
         applySoundSettings(deathPlayer);
-    }
-
-    private void applySoundSettings(MediaPlayer player) {
-        if (soundsMuted) {
-            player.setVolume(0.0);
-        } else {
-            player.setVolume(soundsVolume);
-        }
     }
 
     //Movement

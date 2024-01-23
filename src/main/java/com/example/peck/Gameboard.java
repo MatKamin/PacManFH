@@ -21,6 +21,7 @@ import java.util.*;
 import static com.example.peck.ImageLoader.*;
 import static com.example.peck.LevelLoader.*;
 import static com.example.peck.config.Constants.*;
+import static com.example.peck.util.SoundManagement.applySoundSettings;
 
 /**
  * Represents the game board for Pac-Man.
@@ -334,6 +335,7 @@ public class Gameboard {
                     }
                     Media death = new Media(new File("src/main/resources/sounds/ieatghost.mp3").toURI().toString());
                     MediaPlayer deathGhost = new MediaPlayer(death);
+                    applySoundSettings(deathGhost);
                     deathGhost.play();
                     this.pacman.edible= Pacman.Edible.GHOST;
                     this.pacman.updateScore();
@@ -365,6 +367,7 @@ public class Gameboard {
                             ghost.death();
                             Media death = new Media(new File("src/main/resources/sounds/ieatghost.mp3").toURI().toString());
                             MediaPlayer deathGhost = new MediaPlayer(death);
+                            applySoundSettings(deathGhost);
                             deathGhost.play();
                             this.pacman.edible = Pacman.Edible.GHOST;
                             this.pacman.updateScore();
