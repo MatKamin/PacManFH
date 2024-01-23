@@ -82,7 +82,7 @@ public class WinScreenWindow extends Window {
 
             // Start a new game with the next level and the same score
             try {
-                startNewGame(nextLevelFile, CurrentUser.score);
+                startNewGame(nextLevelFile);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -114,9 +114,8 @@ public class WinScreenWindow extends Window {
      * Starts a new game with the specified level file and score.
      *
      * @param levelFile The file path of the level to start.
-     * @param score     The score to carry over to the new game.
      */
-    private void startNewGame(String levelFile, int score) throws IOException {
+    private void startNewGame(String levelFile) throws IOException {
         try {
             PacmanGameWindow pacmanGameWindow = new PacmanGameWindow(levelFile, skinFolder, stage);
             stage.setScene(pacmanGameWindow.getGameView());

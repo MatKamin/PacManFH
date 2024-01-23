@@ -73,7 +73,7 @@ public class DeathScreenWindow extends Window {
             stage.setScene(gameMenuWindow.getScene());
         });
 
-        exitButton = new Button(" EXIT ");
+        exitButton = new Button("EXIT");
         exitButton.setFont(Fonts.emulogicFont);
         exitButton.getStyleClass().add("customButton");
         exitButton.setOnAction(e -> {
